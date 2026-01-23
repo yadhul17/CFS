@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundwave | Fueling Dreams</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 min-h-screen relative overflow-x-hidden">
+
+    <div class="fixed top-0 left-0 w-full h-full z-[-1] pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-200/40 rounded-full blur-[120px]"></div>
+        <div class="absolute top-[30%] right-[-5%] w-[500px] h-[500px] bg-cyan-100/30 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-[-10%] left-[5%] w-[700px] h-[700px] bg-indigo-100/40 rounded-full blur-[130px]"></div>
+    </div>
+
+    <header class="relative w-full h-[100vh] flex flex-col items-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="{% static 'top.jpg' %}" 
+                 alt="Background" 
+                 class="w-full h-full object-cover object-center brightness-[0.7] contrast-110">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent"></div>
+        </div>
+
+        <nav class="relative z-20 w-[90%] md:w-[70%] flex justify-between items-center px-8 py-4 mt-6 bg-white/80 backdrop-blur-md shadow-xl border border-white/30 rounded-full">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-gradient-to-tr from-cyan-400 to-blue-500 rounded-full shadow-inner"></div>
+                <div class="flex items-baseline">
+                    <span class="text-2xl font-black text-cyan-600 tracking-tight">Fund</span>
+                    <span class="text-xl font-black text-slate-900 tracking-tighter">wave</span>
+                </div>
+            </div>
+
+            <div class="hidden md:flex gap-8 items-center">
+                <a href="#" class="text-slate-600 hover:text-cyan-600 transition font-bold text-sm">Explore</a>
+                <a href="../userregister/" class="bg-cyan-50 text-cyan-700 px-5 py-2 rounded-full font-bold hover:bg-cyan-100 transition text-sm">Start Campaign</a>
+                <a href="#" class="bg-slate-900 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-black transition text-sm">How It Works</a>
+            </div>
+        </nav>
+
+        <div class="relative z-10 flex-grow flex flex-col items-center justify-center text-center px-4">
+            <h1 class="text-6xl md:text-8xl font-black text-white tracking-tighter drop-shadow-2xl">
+                Fund Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">Dream</span>
+            </h1>
+            <p class="mt-6 text-xl md:text-2xl text-slate-100 font-light max-w-2xl drop-shadow-md">
+                Empowering innovators and creators to bring their visions to life.
+            </p>
+            
+            <div class="mt-10 flex flex-wrap gap-4 justify-center">
+                <button class="bg-cyan-500 hover:bg-cyan-400 text-white px-10 py-4 rounded-full font-black transition transform hover:scale-105 shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+                    Get Started
+                </button>
+                <button class="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/30 px-10 py-4 rounded-full font-black transition">
+                    View Projects
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class=" z-10 -mt-50 max-w-7xl mx-auto px-6 pb-24">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div class="relative">
+                <span class="text-xs font-black uppercase tracking-[0.3em] text-blue-600 mb-2 block">Trending Projects</span>
+                <h1 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900">
+                    Featured <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Campaigns</span>
+                </h1>
+                <div class="h-2 w-20 bg-blue-600 mt-4 rounded-full"></div>
+            </div>
+            <a href="#" class="mt-6 md:mt-0 group flex items-center gap-2 text-blue-600 font-bold hover:gap-4 transition-all">
+                Browse all categories <span>&rarr;</span>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {% for i in campaigns %}
+                <div class="group glass-card rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_30px_60px_rgba(59,130,246,0.12)] border border-white/50 overflow-hidden transition-all duration-500 transform hover:-translate-y-4">
+                    
+                    <div class="relative h-64 w-full overflow-hidden">
+                        {% if i.image %}
+                            <img src="{{ i.image.url }}" 
+                                 alt="{{ i.title }}" 
+                                 class="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700">
+                        {% else %}
+                            <div class="w-full h-full bg-slate-200 flex items-center justify-center">No Image</div>
+                        {% endif %}
+                        
+                        <div class="absolute top-5 left-5">
+                            <span class="bg-white/90 backdrop-blur-md text-slate-900 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-lg">
+                                {{ i.category }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-8">
+                        <h3 class="text-2xl font-black text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
+                            {{ i.title }}
+                        </h3>
+                        
+                        <div class="mt-6 mb-4">
+                            <div class="flex justify-between text-xs font-black mb-2">
+                                <span class="text-slate-400 uppercase tracking-tighter">Current Progress</span>
+                                <span class="text-blue-600">75%</span>
+                            </div>
+                            <div class="w-full bg-slate-100/50 rounded-full h-3 p-0.5">
+                                <div class="bg-gradient-to-r from-blue-600 to-cyan-400 h-full rounded-full shadow-[0_0_15px_rgba(59,130,246,0.4)]" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center mt-8 pt-6 border-t border-slate-100">
+                            <div>
+                                <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Target Goal</p>
+                                <span class="text-2xl font-black text-slate-900">${{ i.goal }}</span>
+                            </div>
+                            
+                            <button class="bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-blue-600 hover:shadow-xl transition-all active:scale-95">
+                                Support
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full py-32 text-center bg-white/50 rounded-3xl border-2 border-dashed border-slate-200">
+                    <p class="text-slate-400 text-xl font-medium tracking-tight">Currently, there are no approved campaigns to display.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
+</body>
+</html>
