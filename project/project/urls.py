@@ -26,12 +26,17 @@ urlpatterns = [
     path('adminlogin/',views.adminlogin,name="adminlogin"),
     path('admindashboard/',views.admindashboard,name="admindashboard"),
     path('updatestatus/<int:id>/',views.update_campaign_status,name="upadtestatus"),
+    path('getusers/',views.get_users,name="getusers"),
     path('',views.home,name="home"),
 
     path('userregister/',views.userregister,name="register"),
     path('userlogin/',views.userlogin,name="login"),
     path('userdashboard/',views.userdashboard,name="dashboard"),
-    path('createcampain/',views.createcampain,name="campaine")
+    path('createcampain/',views.createcampain,name="campaine"),
+    path('explore/',views.explore,name="allprojects"),
+
+    path('campain/<int:id>/',views.campainview,name="campain"),
+    path('doantefund/<int:id>/',views.donate,name="donates")
 ]
 
 

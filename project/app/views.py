@@ -3,8 +3,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from .models import *
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
-# Create your views here.
 
 def adminlogin(request):
     if request.method=='POST':
@@ -27,23 +28,48 @@ def adminlogin(request):
     return render(request,'adminlogin.html')
 
 
+from django.shortcuts import render
+from .models import Campaign
+
 def admindashboard(request):
-    campains=Campaign.objects.all()
-    print(campains)
+    campains = Campaign.objects.all()
     
+    total_count = campains.count()
+    
+   
+    pending_count = Campaign.objects.filter(
+        Q(status="pending") | Q(status="Rejected")
+    ).count()  
+    print(pending_count)  
+    # 4. Get Approved Count (optional but useful for dashboards)
+    approved_count = Campaign.objects.filter(status="Approved").count()
+
+    context = {
+        'campains': campains,
+        'total_count': total_count,
+        'pending_count': pending_count,
+        'approved_count': approved_count,
+    }
+
+    print(f"Total: {total_count}, Pending: {pending_count}")
+
+    
+    return render(request, 'admindashboard.html', context)
 
 
-    return render(request,'admindashboard.html',{'campains':campains})
+def get_users(request):
+    users = User.objects.filter(~Q(is_staff=True))
+    print(users)
+    return render(request,'users.html',{'users':users})
 def update_campaign_status(request, id):
     if request.method == 'POST':
         value = request.POST.get('action')
         
-        # This will now show in your terminal!
+      
         print(f"Action received: {value}")
         print(f"Campaign ID: {id}")
 
-        # --- Actual Database Update ---
-        # 1. Get the object
+      
         campaign = get_object_or_404(Campaign, id=id)
         
         if value == 'approve':
@@ -57,8 +83,36 @@ def update_campaign_status(request, id):
    
     return redirect('admindashboard')
 
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import Campaign
+
+def campainview(request, id):
+    # Fetch the campaign or return 404
+    campaign = get_object_or_404(Campaign, id=id)
+
+    # In your model, you don't have a 'raised' field yet. 
+    # I'll set it to 0 for now, but you should add it to your model later!
+    raised_amount = 0 
+    
+    # Calculate progress
+    progress = 0
+    if campaign.goal > 0:
+        progress = (raised_amount / float(campaign.goal)) * 100
+
+    # Formatting for the template
+    context = {
+        'campaign': campaign,
+        'progress': progress,
+        'raised_str': "{:,.2f}".format(raised_amount),
+        'goal_str': "{:,.2f}".format(campaign.goal),
+    }
+
+    return render(request, 'campainview.html', context)
+
 def home(request):
-    campaigns = Campaign.objects.filter(status="Approved")
+    campaigns = Campaign.objects.filter(status="Approved")[:3]
     
     print("Printing approved campaigns to server console:")
     print(campaigns)
@@ -111,8 +165,43 @@ def userlogin(request):
     return render(request, 'userlogin.html')
 
 
-def userdashboard(requset):
-    return render(requset,'userdashboard.html')
+
+
+
+@login_required
+def userdashboard(request):
+    user = request.user  # 'user' now holds the logged-in User object
+    print(user)      
+       # This will print the username to your terminal
+    print(user.id)
+    campaigns=Campaign.objects.filter(creator=user.id)
+    print(campaigns)
+    return render(request, 'userdashboard.html',{'campaigns':campaigns})
+
+def explore(request):
+    query = request.GET.get('q')
+    
+    if query:
+        # Filter: title contains query OR description contains query
+        campains = Campaign.objects.filter(
+            Q(title__icontains=query) | 
+            Q(description__icontains=query) |
+            Q(category__icontains=query)
+        ).distinct()
+    else:
+        # If no query, show all
+        
+        campains=Campaign.objects.all()
+
+    return render (request,'explore.html',{'campains':campains})
+
+def donate(request,id):
+    campaign=Campaign.objects.get(id=id)
+    print(campaign)
+    if request.method == 'POST':
+        amount=request.POST.get('cash')
+        print(amount)
+    return render(request,'donate.html',{'campaign':campaign})
 
 
 def createcampain(request):

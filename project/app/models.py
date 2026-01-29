@@ -33,3 +33,18 @@ class Campaign(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.status}"
+    
+
+class Fund(models.Model):
+    name=models.CharField(max_length=20,null=True)
+    phoneno=models.CharField(max_length=10,null=True)
+    campain=models.ForeignKey(Campaign,on_delete=models.CASCADE,related_name='project')
+    cash=models.IntegerField()
+    
+    donated_at = models.DateTimeField(auto_now_add=True,null=True)
+    def __str__(self):
+        return f"{self.title} - {self.status}"
+    def progress_percentage(self):
+        if self.goal_amount <= 0:
+            return 0
+        return int((self.raised_amount / self.goal_amount) * 100)

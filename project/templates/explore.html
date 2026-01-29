@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Projects | CrowdFund</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .progress-bar { transition: width 1s ease-in-out; }
+        .project-card:hover { transform: translateY(-5px); }
+        /* Hide scrollbar for category tabs */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900">
+
+    <nav class="sticky top-0 z-50 bg-white border-b border-blue-100 px-6 py-4 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-8">
+            <h1 class="text-2xl font-bold text-blue-600">Crowd<span class="text-slate-800">Fund</span></h1>
+            
+           <form action="{% url 'allprojects' %}" method="GET" class="hidden md:flex items-center bg-blue-50 border border-blue-100 rounded-full px-4 py-2 w-96">
+    <input 
+        type="text" 
+        name="q" 
+        value="{{ request.GET.q|default:'' }}" 
+        placeholder="Search projects..." 
+        class="bg-transparent border-none focus:outline-none w-full text-sm"
+    >
+    <button type="submit" class="hover:scale-110 transition-transform">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+    </button>
+</form>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            {% if user.is_authenticated %}
+                <span class="text-sm text-slate-600 font-medium">Hi, {{ user.username }}</span>
+                <button class="bg-blue-600 text-white px-5 py-2 rounded-lg font-medium shadow-lg shadow-blue-200 hover:bg-blue-700 transition">Start a Project</button>
+            {% else %}
+                <button class="text-blue-600 font-medium px-4 py-2 hover:bg-blue-50 rounded-lg">Log In</button>
+                <button class="bg-blue-600 text-white px-5 py-2 rounded-lg font-medium shadow-lg shadow-blue-200 hover:bg-blue-700 transition">Join Now</button>
+            {% endif %}
+        </div>
+    </nav>
+
+    <section class="max-w-7xl mx-auto px-6 py-8">
+        
+        <div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
+            <button class="px-6 py-2 bg-blue-600 text-white rounded-full whitespace-nowrap shadow-md shadow-blue-100">All Projects</button>
+            <button class="px-6 py-2 bg-white border border-blue-200 text-slate-600 hover:border-blue-400 rounded-full whitespace-nowrap transition">Technology</button>
+            <button class="px-6 py-2 bg-white border border-blue-200 text-slate-600 hover:border-blue-400 rounded-full whitespace-nowrap transition">Education</button>
+            <button class="px-6 py-2 bg-white border border-blue-200 text-slate-600 hover:border-blue-400 rounded-full whitespace-nowrap transition">Environment</button>
+            <button class="px-6 py-2 bg-white border border-blue-200 text-slate-600 hover:border-blue-400 rounded-full whitespace-nowrap transition">Medical</button>
+        </div>
+
+        <div class="mt-8 mb-8">
+            <h2 class="text-3xl font-bold">Explore <span class="text-blue-600">{{ campains.count }}</span> active projects</h2>
+            <p class="text-slate-500 mt-1">Directly support the people and ideas you believe in.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            {% for campaign in campains %}
+            <div class="project-card bg-white rounded-2xl overflow-hidden border border-blue-50 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
+                <div class="h-52 bg-slate-200 relative overflow-hidden">
+                    {% if campaign.image %}
+                        <img src="{{ campaign.image.url }}" alt="{{ campaign.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-blue-50 text-blue-300 font-bold uppercase tracking-widest text-xs">No Preview Image</div>
+                    {% endif %}
+                    
+                    <span class="absolute top-4 left-4 bg-white/95 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black text-blue-600 uppercase tracking-widest border border-blue-100 shadow-sm">
+                        {{ campaign.category|default:"General" }}
+                    </span>
+                </div>
+
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-xl font-bold mb-2 text-slate-800 line-clamp-1">{{ campaign.title }}</h3>
+                    <p class="text-slate-500 text-sm mb-6 line-clamp-2 leading-relaxed">
+                        {{ campaign.description|truncatewords:25 }}
+                    </p>
+                    
+                    <div class="mt-auto space-y-4">
+                        <div class="space-y-2">
+                            <div class="w-full bg-blue-50 h-2 rounded-full overflow-hidden">
+                                <div class="bg-blue-600 h-full progress-bar shadow-[0_0_8px_rgba(37,99,235,0.4)]" 
+                                     style="width: {{ campaign.progress_percentage }}%"></div>
+                            </div>
+                            
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <p class="text-lg font-bold text-blue-600">${{ campaign.raised_amount }}</p>
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Raised of ${{ campaign.goal }}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-slate-700">{{ campaign.progress_percentage }}%</p>
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Funded</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="../campain/{{ campaign.id }}/" class="block w-full text-center py-3 bg-white border-2 border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-200">
+                            DONATE
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full py-20 text-center">
+                <div class="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800">No campaigns yet</h3>
+                <p class="text-slate-500">There are no active campaigns to display right now.</p>
+            </div>
+            {% endfor %}
+
+        </div>
+    </section>
+
+    <footer class="mt-20 border-t border-blue-100 bg-white py-10 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <p class="text-slate-400 text-sm">© 2026 CrowdFund Intern Project. Clean & Minimal Design.</p>
+            <div class="flex gap-6 text-sm font-medium text-slate-600">
+                <a href="#" class="hover:text-blue-600 transition">Terms</a>
+                <a href="#" class="hover:text-blue-600 transition">Privacy</a>
+                <a href="#" class="hover:text-blue-600 transition">Support</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
