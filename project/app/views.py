@@ -217,13 +217,16 @@ def createcampain(request):
         conductor_contact = request.POST.get('conductor_contact')
         conductor_bio = request.POST.get('conductor_bio')
         
-        # 3. Collect File Data (Crucial for ImageField)
+        # NEW: Collect Razorpay Account ID from the form
+        razorpay_id = request.POST.get('razorpay_account_id')
+
+        # 3. Collect File Data
         image = request.FILES.get('image')
 
         # 4. Create and Save the Model Instance
         try:
             new_campaign = Campaign.objects.create(
-                creator=request.user,  # Links the campaign to the logged-in intern/user
+                creator=request.user,
                 title=title,
                 category=category,
                 goal=goal,
@@ -232,9 +235,13 @@ def createcampain(request):
                 conductor_contact=conductor_contact,
                 conductor_bio=conductor_bio,
                 image=image,
-                status='pending'  # It starts as pending for admin approval
+                # Link the razorpay ID here
+                razorpay_account_id=razorpay_id, 
+                status='pending'
             )
-            new_campaign.save()
+            # No need for new_campaign.save() after .objects.create() 
+            # as create() saves it to the DB automatically.
+            
             messages.success(request, "Campaign submitted successfully! Waiting for admin approval.")
             return redirect('dashboard')
             
@@ -242,3 +249,25 @@ def createcampain(request):
             messages.error(request, f"Error creating campaign: {e}")
 
     return render(request, 'campain.html')
+@login_required
+def deletecampaign(request, id):
+    # 1. Fetch the specific campaign instance
+    campaign = get_object_or_404(Campaign, id=id)
+
+    # 2. Security Check: Only the creator (or a staff member) can delete it
+    if campaign.creator != request.user and not request.user.is_staff:
+        messages.error(request, "You do not have permission to delete this campaign.")
+        return redirect('dashboard')
+
+    # 3. Execution: Use the instance 'campaign' in lowercase
+    try:
+        campaign.delete()
+        messages.success(request, f"Campaign '{campaign.title}' deleted successfully.")
+    except Exception as e:
+        messages.error(request, f"Error deleting campaign: {e}")
+
+    # 4. Redirect based on who deleted it
+    if request.user.is_staff:
+        return redirect('admindashboard')
+    return redirect('dashboard')
+    

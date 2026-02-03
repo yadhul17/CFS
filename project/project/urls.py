@@ -33,6 +33,7 @@ urlpatterns = [
     path('userlogin/',views.userlogin,name="login"),
     path('userdashboard/',views.userdashboard,name="dashboard"),
     path('createcampain/',views.createcampain,name="campaine"),
+    path('deletecampagin/<int:id>/',views.deletecampaign,name="delete"),
     path('explore/',views.explore,name="allprojects"),
 
     path('campain/<int:id>/',views.campainview,name="campain"),

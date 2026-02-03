@@ -15,6 +15,7 @@ class Campaign(models.Model):
     conductor_name = models.CharField(max_length=255)
     conductor_contact = models.CharField(max_length=255, blank=True, null=True)
     conductor_bio = models.TextField(blank=True, null=True)
+    razorpay_account_id = models.CharField(max_length=100, blank=True, null=True)
     
     # Media
     image = models.ImageField(upload_to='campaign_banners/')
