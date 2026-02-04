@@ -5,132 +5,320 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fundwave | Fueling Dreams</title>
+    <meta name="description" content="Empowering innovators and creators to bring their visions to life through community crowdfunding.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '4xl': '2rem',
+                        '5xl': '2.5rem',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-soft': 'pulse-soft 4s ease-in-out infinite',
+                        'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'pulse-soft': {
+                            '0%, 100%': { opacity: '0.4' },
+                            '50%': { opacity: '0.6' },
+                        },
+                        'fade-in-up': {
+                            from: { opacity: '0', transform: 'translateY(30px)' },
+                            to: { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
+        
         .glass-card {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #22d3ee 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .shadow-card {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+        }
+        
+        .shadow-card-hover {
+            box-shadow: 0 30px 60px rgba(59, 130, 246, 0.12);
+        }
+        
+        .shadow-nav {
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 0.6s ease-out forwards;
+        }
+        
+        .animation-delay-200 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+        
+        .animation-delay-400 {
+            animation-delay: 0.4s;
+            opacity: 0;
         }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-800 min-h-screen relative overflow-x-hidden">
+<body class="bg-slate-50 text-slate-800 min-h-screen relative overflow-x-hidden font-sans">
 
-    <div class="fixed top-0 left-0 w-full h-full z-[-1] pointer-events-none">
-        <div class="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-200/40 rounded-full blur-[120px]"></div>
-        <div class="absolute top-[30%] right-[-5%] w-[500px] h-[500px] bg-cyan-100/30 rounded-full blur-[100px]"></div>
-        <div class="absolute bottom-[-10%] left-[5%] w-[700px] h-[700px] bg-indigo-100/40 rounded-full blur-[130px]"></div>
+    <!-- Background Blobs -->
+    <div class="fixed top-0 left-0 w-full h-full z-[-1] pointer-events-none overflow-hidden">
+        <div class="absolute w-[400px] md:w-[600px] h-[400px] md:h-[600px] top-[-10%] left-[-10%] bg-blue-200/40 rounded-full blur-[120px] animate-pulse"></div>
+        <div class="absolute w-[350px] md:w-[500px] h-[350px] md:h-[500px] top-[30%] right-[-5%] bg-cyan-100/30 rounded-full blur-[100px] animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute w-[500px] md:w-[700px] h-[500px] md:h-[700px] bottom-[-10%] left-[5%] bg-indigo-100/40 rounded-full blur-[130px] animate-pulse" style="animation-delay: 2s;"></div>
     </div>
 
-    <header class="relative w-full h-[100vh] flex flex-col items-center overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <img src="{% static 'top.jpg' %}" alt="Background" class="w-full h-full object-cover object-center brightness-[0.7] contrast-110">
-            <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent"></div>
+    <!-- Hero Section -->
+    <header class="relative w-full min-h-screen flex flex-col items-center overflow-hidden">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0 overflow-hidden">
+            <img src="{% static 'hero-bg.jpg' %}" 
+                 alt="Crowdfunding community" 
+                 class="w-full h-full object-cover object-center brightness-[0.7] contrast-110">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-50 via-transparent to-transparent opacity-100"></div>
         </div>
 
-        <nav class="relative z-20 w-[90%] md:w-[70%] flex justify-between items-center px-8 py-4 mt-6 bg-white/80 backdrop-blur-md shadow-xl border border-white/30 rounded-full">
+        <!-- Navbar -->
+        <nav class="relative z-20 w-[90%] md:w-[70%] flex justify-between items-center px-6 md:px-8 py-4 mt-6 glass-card shadow-nav rounded-full">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-gradient-to-tr from-cyan-400 to-blue-500 rounded-full shadow-inner"></div>
+                <div class="w-8 h-8 gradient-primary rounded-full shadow-inner"></div>
                 <div class="flex items-baseline">
-                    <span class="text-2xl font-black text-cyan-600 tracking-tight">Fund</span>
+                    <span class="text-2xl font-black text-cyan-500 tracking-tight">Fund</span>
                     <span class="text-xl font-black text-slate-900 tracking-tighter">wave</span>
                 </div>
             </div>
+            
+            <!-- Desktop Navigation -->
             <div class="hidden md:flex gap-8 items-center">
-                <a href="../explore/" class="text-slate-600 hover:text-cyan-600 transition font-bold text-sm">Explore</a>
-                <a href="../userregister/" class="bg-cyan-50 text-cyan-700 px-5 py-2 rounded-full font-bold hover:bg-cyan-100 transition text-sm">Start Campaign</a>
-                <a href="#" class="bg-slate-900 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-black transition text-sm">How It Works</a>
+                <a href="{% url 'allprojects' %}" class="text-slate-600 hover:text-cyan-500 transition font-bold text-sm">Explore</a>
+                <a href="{% url 'register' %}" class="bg-cyan-50 text-cyan-700 px-5 py-2 rounded-full font-bold hover:bg-cyan-100 transition text-sm">Start Campaign</a>
+                <a href="../help/" class="bg-slate-900 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-slate-800 transition text-sm">How It Works</a>
             </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobileMenuBtn" class="md:hidden p-2 text-slate-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
         </nav>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobileMenu" class="hidden absolute top-24 left-[5%] right-[5%] z-30 glass-card rounded-3xl p-6 shadow-nav md:hidden">
+            <div class="flex flex-col gap-4">
+                <a href="{% url 'allprojects' %}" class="text-slate-600 hover:text-cyan-500 transition font-bold text-sm py-2">Explore</a>
+                <a href="../register/" class="bg-cyan-50 text-cyan-700 px-5 py-3 rounded-full font-bold hover:bg-cyan-100 transition text-sm text-center">Start Campaign</a>
+                <a href="../help/" class="bg-slate-900 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-slate-800 transition text-sm text-center">How It Works</a>
+            </div>
+        </div>
 
+        <!-- Hero Content -->
         <div class="relative z-10 flex-grow flex flex-col items-center justify-center text-center px-4">
-            <h1 class="text-6xl md:text-8xl font-black text-white tracking-tighter drop-shadow-2xl">
-                Fund Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">Dream</span>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter drop-shadow-2xl animate-fade-in-up">
+                Fund Your <span class="gradient-text">Dream</span>
             </h1>
-            <p class="mt-6 text-xl md:text-2xl text-slate-100 font-light max-w-2xl drop-shadow-md">
+            <p class="mt-6 text-lg md:text-xl lg:text-2xl text-white/90 font-light max-w-2xl drop-shadow-md animate-fade-in-up animation-delay-200">
                 Empowering innovators and creators to bring their visions to life.
             </p>
+            <div class="mt-10 flex flex-col sm:flex-row gap-4 animate-fade-in-up animation-delay-400">
+                <a href="#campaigns" class="gradient-primary text-white px-8 py-4 rounded-full font-bold shadow-xl hover:scale-105 transition-transform text-sm md:text-base">
+                    Explore Campaigns
+                </a>
+                <a href="{% url 'register' %}" class="glass-card text-slate-800 px-8 py-4 rounded-full font-bold hover:scale-105 transition-transform text-sm md:text-base">
+                    Start Yours
+                </a>
+            </div>
         </div>
     </header>
 
-    <main class="z-10 pt-10 max-w-7xl mx-auto px-6 pb-24">
+    <!-- Main Content -->
+    <main class="relative z-10 pt-10 max-w-7xl mx-auto px-6 pb-24">
         
-       <div class="mb-16 w-full flex justify-center">
-    <div class="overflow-hidden rounded-[2.5rem] shadow-2xl border border-white/50 bg-slate-900 aspect-[21/9] w-full max-w-5xl relative group">
-        
-        <img id="heroImage"
-            src="{% static 'boy.jpg' %}" 
-            alt="A boy waiting for water" 
-            class="w-full h-full object-cover object-center transition-all duration-1000 ease-in-out opacity-100"
-        />
-        
-        <div id="donateSection" class="absolute inset-0 transition-opacity duration-500 opacity-100">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-            
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                <h3 class="text-white text-3xl md:text-5xl font-black tracking-tighter mb-6 drop-shadow-xl">
-                    Every Drop <span class="text-blue-400">Counts.</span>
-                </h3>
+      
                 
-                <button onclick="handleDonate()"
-                    class="bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.3em] px-10 py-4 rounded-full shadow-xl transform transition-transform hover:scale-110 active:scale-95">
-                    DONATE $1
-                </button>
-            </div>
-        </div>
+             
 
-        <div id="thanksSection" 
-            class="absolute inset-0 flex flex-col items-center justify-center text-center px-6 transition-all duration-1000 opacity-0 translate-y-4 pointer-events-none">
-            <h2 class="text-4xl md:text-6xl font-black text-white tracking-tighter mb-4">
-                Thank You <span class="text-blue-400">Heartfully!</span>
-            </h2>
-            <p class="text-gray-300 text-lg max-w-md">
-                Your contribution makes a real difference in this child's life.
-            </p>
-            <button onclick="resetView()" class="mt-8 text-xs text-gray-400 uppercase tracking-widest hover:text-white transition cursor-pointer">
-                Return to image
-            </button>
-        </div>
-    </div>
-</div>
+                
+        
 
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+        <!-- Featured Campaigns Header -->
+        <div id="campaigns" class="flex flex-col md:flex-row md:items-end justify-between mb-12">
             <div class="relative">
                 <span class="text-xs font-black uppercase tracking-[0.3em] text-blue-600 mb-2 block">Trending Projects</span>
-                <h1 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900">
-                    Featured <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Campaigns</span>
-                </h1>
+                <h2 class="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-900">
+                    Featured <span class="gradient-text">Campaigns</span>
+                </h2>
                 <div class="h-2 w-20 bg-blue-600 mt-4 rounded-full"></div>
             </div>
+            <a href="{% url 'allprojects' %}" class="mt-6 md:mt-0 text-slate-500 hover:text-cyan-500 font-bold text-sm transition">
+                View All →
+            </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {% for i in campaigns %}
-            <div class="group bg-white/70 backdrop-blur-md rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_30px_60px_rgba(59,130,246,0.12)] border border-white/50 overflow-hidden transition-all duration-500 transform hover:-translate-y-4">
+        <!-- Campaign Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+            {% for campaign in campaigns %}
+            <div class="group glass-card rounded-5xl shadow-card hover:shadow-card-hover overflow-hidden transition-all duration-500 transform hover:-translate-y-4">
+                <!-- Image -->
                 <div class="relative h-64 w-full overflow-hidden">
-                    {% if i.image %}
-                    <img src="{{ i.image.url }}" class="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700">
+                    {% if campaign.image %}
+                    <img src="{{ campaign.image.url }}" 
+                         alt="{{ campaign.title }}"
+                         class="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700">
                     {% else %}
                     <div class="w-full h-full bg-slate-200 flex items-center justify-center font-bold text-slate-400">No Image</div>
                     {% endif %}
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <div class="p-8">
-                    <h3 class="text-2xl font-black text-slate-900 mb-3">{{ i.title }}</h3>
-                    <div class="flex justify-between items-center mt-8 pt-6 border-t border-slate-100">
-                        <span class="text-2xl font-black text-slate-900">${{ i.goal }}</span>
-                        <a href="../campain/{{ i.id }}/">
-                            <button class="bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-blue-600 transition-all">Support</button>
+                
+                <!-- Content -->
+                <div class="p-6 md:p-8">
+                    <h3 class="text-xl md:text-2xl font-black text-slate-900 mb-2 line-clamp-2">{{ campaign.title }}</h3>
+                    <p class="text-slate-500 text-sm mb-4 line-clamp-2">{{ campaign.description }}</p>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full gradient-primary rounded-full transition-all duration-500" 
+                                 style="width: {% widthratio campaign.raised campaign.goal 100 %}%"></div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-xs text-slate-500">
+                            <span>${{ campaign.raised|floatformat:0 }} raised</span>
+                            <span>{% widthratio campaign.raised campaign.goal 100 %}%</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="flex justify-between items-center mt-6 pt-6 border-t border-slate-100">
+                        <span class="text-xl md:text-2xl font-black text-slate-900">${{ campaign.goal|floatformat:0 }}</span>
+                        <a href="{% url 'campain' campaign.id %}">
+                            <button class="bg-slate-900 text-white px-5 md:px-6 py-2.5 md:py-3 rounded-2xl text-sm font-black hover:bg-blue-600 transition-all">
+                                Support
+                            </button>
                         </a>
                     </div>
                 </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <p class="text-slate-500 text-lg">No campaigns yet. Be the first to start one!</p>
             </div>
             {% endfor %}
         </div>
     </main>
 
+    <!-- Footer -->
+    <footer class="relative z-10 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-6 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+                <!-- Brand -->
+                <div class="md:col-span-1">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 gradient-primary rounded-full shadow-inner"></div>
+                        <div class="flex items-baseline">
+                            <span class="text-2xl font-black text-cyan-400 tracking-tight">Fund</span>
+                            <span class="text-xl font-black text-white tracking-tighter">wave</span>
+                        </div>
+                    </div>
+                    <p class="text-white/60 text-sm">
+                        Empowering dreamers to turn their visions into reality through community support.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-bold text-sm uppercase tracking-wider mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'allprojects' %}" class="text-white/60 hover:text-cyan-400 transition text-sm">Explore</a></li>
+                        <li><a href="{% url 'register' %}" class="text-white/60 hover:text-cyan-400 transition text-sm">Start Campaign</a></li>
+                        <li><a href="../help/" class="text-white/60 hover:text-cyan-400 transition text-sm">How It Works</a></li>
+                        <li><a href="#" class="text-white/60 hover:text-cyan-400 transition text-sm">Success Stories</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div>
+                    <h4 class="font-bold text-sm uppercase tracking-wider mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-white/60 hover:text-cyan-400 transition text-sm">Help Center</a></li>
+                        <li><a href="#" class="text-white/60 hover:text-cyan-400 transition text-sm">Contact Us</a></li>
+                        <li><a href="#" class="text-white/60 hover:text-cyan-400 transition text-sm">FAQs</a></li>
+                        <li><a href="#" class="text-white/60 hover:text-cyan-400 transition text-sm">Trust & Safety</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="font-bold text-sm uppercase tracking-wider mb-4">Stay Updated</h4>
+                    <p class="text-white/60 text-sm mb-4">
+                        Get the latest campaigns and success stories.
+                    </p>
+                    <form class="flex gap-2">
+                        <input type="email" 
+                               placeholder="Your email" 
+                               class="flex-1 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                        <button type="submit" class="gradient-primary px-4 py-2 rounded-full font-bold text-sm hover:scale-105 transition-transform">
+                            Join
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Bottom -->
+            <div class="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-white/40 text-sm">
+                    © 2024 Fundwave. All rights reserved.
+                </p>
+                <div class="flex gap-6">
+                    <a href="#" class="text-white/40 hover:text-cyan-400 transition text-sm">Privacy</a>
+                    <a href="#" class="text-white/40 hover:text-cyan-400 transition text-sm">Terms</a>
+                    <a href="#" class="text-white/40 hover:text-cyan-400 transition text-sm">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Donate Animation
         function handleDonate() {
             const img = document.getElementById('heroImage');
             const donateSec = document.getElementById('donateSection');

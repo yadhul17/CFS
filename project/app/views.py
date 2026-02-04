@@ -337,17 +337,26 @@ def payment_success(request):
                     # 5. Update the snapshot
                     fund.total_raised = actual_total_raised
                     fund.save()
-                    
-                    # Prepare context for the success page
-                    context = {
-                        'fund': fund,
-                        'campaign': campaign,
-                        'amount': fund.cash
-                    }
-                    return render(request, 'success.html', context)
+
+            remain = max(campaign.goal - actual_total_raised, 0)
+    
+            progress_percentage = 0
+            if campaign.goal > 0:
+                progress_percentage = min((actual_total_raised / campaign.goal) * 100, 100)
+
+            context = {
+                'fund': fund,
+                'campaign': campaign,
+                'amount': fund.cash if fund else 0,
+                'remain': remain,
+                'actual_total_raised': actual_total_raised,
+                'progress_percentage': progress_percentage,
+                'goal': campaign.goal,
+            }
+            return render(request, 'success.html', context)
                 
                 # If already paid, just show success
-                return render(request, 'success.html', {'fund': fund})
+               
 
         except razorpay.errors.SignatureVerificationError:
             return render(request, 'failure.html', {'error': "Signature mismatch. Authenticity could not be verified."})
@@ -424,6 +433,7 @@ def deletecampaign(request, id):
         return redirect('admindashboard')
     return redirect('dashboard')
     
-
+def working(request):
+    return render(request,'working.html')
 
 

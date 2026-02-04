@@ -35,6 +35,7 @@ urlpatterns = [
     path('createcampain/',views.createcampain,name="campaine"),
     path('deletecampagin/<int:id>/',views.deletecampaign,name="delete"),
     path('explore/',views.explore,name="allprojects"),
+    path('help/',views.working,),
 
     path('campain/<int:id>/',views.campainview,name="campain"),
     path('doantefund/<int:id>/',views.donate,name="donates"),
