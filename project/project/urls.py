@@ -37,7 +37,8 @@ urlpatterns = [
     path('explore/',views.explore,name="allprojects"),
 
     path('campain/<int:id>/',views.campainview,name="campain"),
-    path('doantefund/<int:id>/',views.donate,name="donates")
+    path('doantefund/<int:id>/',views.donate,name="donates"),
+    path('payment/success/', views.payment_success, name='payment_success'),
 ]
 
 

@@ -1,0 +1,118 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment | {{ campaign.title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+   
+</head>
+<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center border border-slate-100">
+        
+        <div id="payment-loader">
+            <div class="flex justify-center mb-4">
+                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800">Connecting to Gateway</h2>
+            <p class="text-slate-500 text-sm mt-2">Securing your transaction path...</p>
+        </div>
+
+        <div id="payment-ready" class="hidden">
+            <div class="mb-6">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04a11.357 11.357 0 00-1.573 7.811c.19 2.89 1.456 5.592 3.558 7.774a11.52 11.52 0 006.633 3.425a11.456 11.456 0 006.633-3.425c2.102-2.182 3.368-4.884 3.558-7.774a11.357 11.357 0 00-1.573-7.811z" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-900">Support This Cause</h2>
+                <p class="text-slate-500 mt-1">Contributing to: <span class="font-semibold text-slate-700">{{ campaign.title }}</span></p>
+            </div>
+
+            <div class="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-200">
+                <p class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Total Donation</p>
+                <p class="text-4xl font-black text-slate-900">₹{{ amount }}</p>
+            </div>
+
+            <button id="rzp-button1" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition duration-200 shadow-lg shadow-blue-200 flex items-center justify-center gap-2">
+                Pay Securely Now
+            </button>
+            
+            <div class="mt-6 pt-6 border-t border-slate-100 flex flex-col items-center">
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-3">Powered by Razorpay</p>
+                <img src="https://razorpay.com/assets/payment-gateway/payment-method-logos.png" alt="Payment Methods" class="h-5 opacity-50 grayscale hover:grayscale-0 transition duration-300">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+        var options = {
+            "key": "{{ razorpay_key }}", 
+            "amount": "{{ amount }}00", 
+            "currency": "INR",
+            "name": "Crowdfund Hub",
+            "description": "Contribution to {{ campaign.title }}",
+            "order_id": "{{ order_id }}", 
+            "handler": function (response){
+                // Switch back to loader during verification
+                document.getElementById('payment-ready').classList.add('hidden');
+                document.getElementById('payment-loader').classList.remove('hidden');
+
+                var form = document.createElement("form");
+                form.setAttribute("method", "POST");
+                form.setAttribute("action", "{% url 'payment_success' %}");
+
+                var csrfInput = document.createElement("input");
+                csrfInput.setAttribute("type", "hidden");
+                csrfInput.setAttribute("name", "csrfmiddlewaretoken");
+                csrfInput.setAttribute("value", "{{ csrf_token }}");
+                form.appendChild(csrfInput);
+
+                var fields = [
+                    ["razorpay_payment_id", response.razorpay_payment_id],
+                    ["razorpay_order_id", response.razorpay_order_id],
+                    ["razorpay_signature", response.razorpay_signature]
+                ];
+
+                fields.forEach(function(item) {
+                    var input = document.createElement("input");
+                    input.setAttribute("type", "hidden");
+                    input.setAttribute("name", item[0]);
+                    input.setAttribute("value", item[1]);
+                    form.appendChild(input);
+                });
+
+                document.body.appendChild(form);
+                form.submit();
+            },
+            "prefill": {
+                "name": "{{ request.user.get_full_name|default:'' }}",
+                "email": "{{ request.user.email|default:'' }}",
+            },
+            "theme": {
+                "color": "#2563eb"
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+
+        window.onload = function(){
+            // Small delay to make it feel "secure"
+            setTimeout(() => {
+                document.getElementById('payment-loader').classList.add('hidden');
+                document.getElementById('payment-ready').classList.remove('hidden');
+                rzp1.open();
+            }, 800);
+        };
+
+        document.getElementById('rzp-button1').onclick = function(e){
+            rzp1.open();
+            e.preventDefault();
+        }
+    </script>
+
+</body>
+</html>

@@ -5,6 +5,12 @@ from django.contrib import messages
 from .models import *
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+import razorpay
+from django.conf import settings
+from django.db import transaction
+from django.views.decorators.csrf import csrf_exempt
+
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 
 def adminlogin(request):
@@ -91,21 +97,37 @@ from .models import Campaign
 def campainview(request, id):
     # Fetch the campaign or return 404
     campaign = get_object_or_404(Campaign, id=id)
-
-    # In your model, you don't have a 'raised' field yet. 
-    # I'll set it to 0 for now, but you should add it to your model later!
-    raised_amount = 0 
+    print(campaign.id)
     
-    # Calculate progress
-    progress = 0
-    if campaign.goal > 0:
-        progress = (raised_amount / float(campaign.goal)) * 100
+    
 
-    # Formatting for the template
+    
+  # 1. Get the latest 'snapshot' of the total raised from the Fund model
+    last_fund_record = Fund.objects.filter(
+        campain=campaign, 
+        is_paid=True
+    ).last()
+
+    # 2. Extract the amount or default to 0 if no payments exist yet
+    current_total = last_fund_record.total_raised if last_fund_record else 0
+
+    # 3. Calculate Balance (Amount left to reach goal)
+    balance = max(campaign.goal - current_total, 0)
+
+    # 4. Calculate Progress Percentage
+    if campaign.goal > 0:
+        # Formula: (Current / Goal) * 100
+        progress_percent = (current_total / campaign.goal) * 100
+        # Cap at 100% so the progress bar doesn't break the UI
+        progress_percent = min(progress_percent, 100)
+    else:
+        progress_percent = 0
+
     context = {
         'campaign': campaign,
-        'progress': progress,
-        'raised_str': "{:,.2f}".format(raised_amount),
+        'current_state': current_total,      # Total money collected
+        'balance': balance,                # Money still needed
+        'progress': progress_percent,       # 0 to 100 for the bar
         'goal_str': "{:,.2f}".format(campaign.goal),
     }
 
@@ -168,16 +190,25 @@ def userlogin(request):
 
 
 
+from django.db.models import Sum
+
 @login_required
 def userdashboard(request):
-    user = request.user  # 'user' now holds the logged-in User object
-    print(user)      
-       # This will print the username to your terminal
-    print(user.id)
-    campaigns=Campaign.objects.filter(creator=user.id)
-    print(campaigns)
-    return render(request, 'userdashboard.html',{'campaigns':campaigns})
-
+    user = request.user
+    campaigns = Campaign.objects.filter(creator=user)
+    
+    # Get all paid funds for this user's campaigns
+    funds = Fund.objects.filter(campain__creator=user, is_paid=True).order_by('-id')
+    
+    # Calculate the grand total raised across all campaigns
+    total_raised_all = funds.aggregate(Sum('cash'))['cash__sum'] or 0
+    
+    context = {
+        'campaigns': campaigns,
+        'funds': funds,
+        'total_raised_all': total_raised_all,
+    }
+    return render(request, 'userdashboard.html', context)
 def explore(request):
     query = request.GET.get('q')
     
@@ -195,15 +226,137 @@ def explore(request):
 
     return render (request,'explore.html',{'campains':campains})
 
-def donate(request,id):
-    campaign=Campaign.objects.get(id=id)
-    print(campaign)
-    if request.method == 'POST':
-        amount=request.POST.get('cash')
-        print(amount)
-    return render(request,'donate.html',{'campaign':campaign})
 
 
+def donate(request, id):
+    campaign = get_object_or_404(Campaign, id=id)
+    
+    # --- 1. CALCULATE LIVE DATA (For the Progress Bar) ---
+    # Get the last successful fund record to find the total_raised snapshot
+    last_fund_record = Fund.objects.filter(
+        campain=campaign, 
+        is_paid=True
+    ).last()
+
+    current_total = last_fund_record.total_raised if last_fund_record else 0
+    balance = max(campaign.goal - current_total, 0)
+    
+    if campaign.goal > 0:
+        progress_percent = min((current_total / campaign.goal) * 100, 100)
+    else:
+        progress_percent = 0
+
+    # --- 2. HANDLE FORM SUBMISSION (POST) ---
+    if request.method == "POST":
+        amount_str = request.POST.get('cash')
+        name = request.POST.get('name')
+        phoneno = request.POST.get('phoneno')
+
+        if amount_str:
+            amount = int(amount_str)
+            
+            # Create Razorpay Order
+            razorpay_order = razorpay_client.order.create({
+                "amount": amount * 100,  # paise
+                "currency": "INR",
+                "payment_capture": "1"
+            })
+            
+            order_id = razorpay_order['id']
+            
+            # Create local Fund record (Not paid yet)
+            Fund.objects.create(
+                campain=campaign,
+                cash=amount,
+                name=name,
+                phoneno=phoneno,
+                razorpay_order_id=order_id
+            )
+            
+            return render(request, 'payment_checkout.html', {
+                'order_id': order_id,
+                'amount': amount,
+                'campaign': campaign,
+                'razorpay_key': settings.RAZORPAY_KEY_ID
+            })
+
+    # --- 3. RENDER THE DONATE PAGE (GET) ---
+    context = {
+        'campaign': campaign,
+        'current_state': current_total,      # Used for the "Raised" text
+        'balance': balance,                # Used for "Needed" text
+        'progress': progress_percent,       # Used for bar width
+        'goal_str': "{:,.2f}".format(campaign.goal),
+    }
+
+    return render(request, 'donate.html', context)
+
+@csrf_exempt
+def payment_success(request):
+    if request.method == "POST":
+        payment_id = request.POST.get('razorpay_payment_id')
+        order_id = request.POST.get('razorpay_order_id')
+        signature = request.POST.get('razorpay_signature')
+
+        # 1. Validation: Ensure we actually got the data
+        if not all([payment_id, order_id, signature]):
+            return render(request, 'failure.html', {'error': "Missing payment details from Razorpay."})
+
+        params_dict = {
+            'razorpay_order_id': order_id,
+            'razorpay_payment_id': payment_id,
+            'razorpay_signature': signature
+        }
+
+        try:
+            # 2. Verify Signature
+            razorpay_client.utility.verify_payment_signature(params_dict)
+
+            with transaction.atomic():
+                # 3. Fetch the fund record
+                fund = Fund.objects.select_for_update().filter(razorpay_order_id=order_id).first()
+                
+                if not fund:
+                    return render(request, 'failure.html', {'error': "Order not found."})
+
+                # Only process if not already paid (prevents issues on page refresh)
+                if not fund.is_paid:
+                    fund.is_paid = True
+                    fund.razorpay_payment_id = payment_id
+                    fund.save() # Mark as paid first
+
+                    # 4. Calculate total (Now that is_paid=True, the aggregate will include this fund)
+                    campaign = fund.campain
+                    total_data = Fund.objects.filter(
+                        campain=campaign, 
+                        is_paid=True
+                    ).aggregate(Sum('cash'))
+                    
+                    actual_total_raised = total_data['cash__sum'] or 0
+                    
+                    # 5. Update the snapshot
+                    fund.total_raised = actual_total_raised
+                    fund.save()
+                    
+                    # Prepare context for the success page
+                    context = {
+                        'fund': fund,
+                        'campaign': campaign,
+                        'amount': fund.cash
+                    }
+                    return render(request, 'success.html', context)
+                
+                # If already paid, just show success
+                return render(request, 'success.html', {'fund': fund})
+
+        except razorpay.errors.SignatureVerificationError:
+            return render(request, 'failure.html', {'error': "Signature mismatch. Authenticity could not be verified."})
+        except Exception as e:
+            # This will catch things like spelling errors (e.g., if 'campain' is wrong)
+            print(f"CRITICAL ERROR: {str(e)}") 
+            return render(request, 'failure.html', {'error': "An internal error occurred."})
+
+    return redirect('home')
 def createcampain(request):
     if request.method == 'POST':
         # 1. Collect Text Data
@@ -271,3 +424,6 @@ def deletecampaign(request, id):
         return redirect('admindashboard')
     return redirect('dashboard')
     
+
+
+

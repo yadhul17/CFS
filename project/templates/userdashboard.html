@@ -17,11 +17,8 @@
             <a href="#" class="flex items-center py-3 px-6 bg-indigo-800 text-white">
                 <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i> Dashboard
             </a>
-            <a href="#" class="flex items-center py-3 px-6 text-indigo-200 hover:bg-indigo-800 hover:text-white transition">
-                <i data-lucide="send" class="w-5 h-5 mr-3"></i> My Campaigns
-            </a>
-            <a href="#" class="flex items-center py-3 px-6 text-indigo-200 hover:bg-indigo-800 hover:text-white transition">
-                <i data-lucide="settings" class="w-5 h-5 mr-3"></i> Settings
+            <a href="/" class="flex items-center py-3 px-6 text-indigo-200 hover:bg-indigo-800 hover:text-white transition">
+                <i data-lucide="external-link" class="w-5 h-5 mr-3"></i> View Site
             </a>
         </nav>
     </aside>
@@ -29,20 +26,15 @@
     <main class="flex-1">
         <header class="bg-white shadow-sm py-4 px-8 flex justify-between items-center">
             <h2 class="text-xl font-semibold text-gray-800">User Dashboard</h2>
-            
             <div class="flex items-center space-x-6">
-                <a href="../createcampain/" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center">
+                <a href="../createcampain/" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center shadow-md">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Create Campaign
                 </a>
-
                 <div class="relative flex items-center space-x-3 border-l pl-6">
-                    <span class="text-sm font-medium text-gray-700">{{ request.user.first_name }}</span>
+                    <span class="text-sm font-medium text-gray-700">{{ request.user.username }}</span>
                     <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold border-2 border-indigo-200">
-                        {{ request.user.first_name|first }}
+                        {{ request.user.username|first|upper }}
                     </div>
-                    <a href="/" class="text-gray-500 hover:text-red-600 transition" title="Logout">
-                        <i data-lucide="log-out" class="w-5 h-5"></i>
-                    </a>
                 </div>
             </div>
         </header>
@@ -55,79 +47,111 @@
                     </div>
                 {% endfor %}
             {% endif %}
-                </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <p class="text-sm text-gray-500">Active Campaigns</p>
+                    <p class="text-sm text-gray-500 font-medium">Active Campaigns</p>
                     <h3 class="text-2xl font-bold text-gray-800">{{ campaigns.count }}</h3>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <p class="text-sm text-gray-500">Total Backers</p>
-                    <h3 class="text-2xl font-bold text-gray-800"></h3>
+                    <p class="text-sm text-gray-500 font-medium">Total Backers</p>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ funds.count }}</h3>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <p class="text-sm text-gray-500">Funds Raised</p>
-                    <h3 class="text-2xl font-bold text-indigo-600"></h3>
+                    <p class="text-sm text-gray-500 font-medium">Total Funds Raised</p>
+                    <h3 class="text-2xl font-bold text-indigo-600">₹{{ total_raised_all }}</h3>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
                 <div class="p-6 border-b border-gray-100">
                     <h3 class="font-bold text-gray-800">Manage Your Campaigns</h3>
                 </div>
                 <table class="w-full text-left">
-    <thead class="bg-gray-50 text-gray-400 text-xs uppercase font-medium">
-        <tr>
-            <th class="px-6 py-4">Project Name</th>
-            <th class="px-6 py-4">Target</th>
-            <th class="px-6 py-4">Fund Status</th> <th class="px-6 py-4">Status</th>
-            <th class="px-6 py-4">Actions</th>
-        </tr>
-    </thead>
-    <tbody class="divide-y divide-gray-100 text-sm">
-        {% for campaign in campaigns %}
-        <tr class="hover:bg-gray-50 transition">
-            <td class="px-6 py-4 font-semibold text-gray-800">{{ campaign.title }}</td>
-            <td class="px-6 py-4 text-gray-600">${{ campaign.goal }}</td>
-            
-            <td class="px-6 py-4">
-                <div class="flex items-center space-x-2">
-                    <span class="text-gray-900 font-bold">${{ campaign.current_amount|default:"0" }}</span>
-                    <span class="text-gray-400 text-xs">raised</span>
-                </div>
-                <div class="w-24 bg-gray-200 h-1.5 rounded-full mt-1 overflow-hidden">
-                    <div class="bg-indigo-600 h-full" style="width: 0"></div> </div>
-            </td>
+                    <thead class="bg-gray-50 text-gray-400 text-xs uppercase font-medium">
+                        <tr>
+                            <th class="px-6 py-4">Project Name</th>
+                            <th class="px-6 py-4">Target Goal</th>
+                            <th class="px-6 py-4">Progress</th>
+                            <th class="px-6 py-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-sm">
+                        {% for campaign in campaigns %}
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 font-semibold text-gray-800">{{ campaign.title }}</td>
+                            <td class="px-6 py-4 text-gray-600 font-medium">₹{{ campaign.goal }}</td>
+                           <td class="px-6 py-4">
+    <div class="flex items-center space-x-2">
+        <span class="text-gray-900 font-bold">
+            {% with last_fund=campaign.fund_set.last %}
+                {% if last_fund and last_fund.is_paid %}
+                    ₹{{ last_fund.total_raised }}
+                {% else %}
+                    ₹0
+                {% endif %}
+            {% endwith %}
+        </span>
+        <span class="text-gray-400 text-xs font-medium">raised</span>
+    </div>
 
-            <td class="px-6 py-4">
-                <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">Active</span>
-            </td>
-            <td class="px-6 py-4 flex space-x-4">
-                <a href="" class="text-indigo-600 hover:text-indigo-900"><i data-lucide="edit-3" class="w-4 h-4"></i></a>
-               <a href="{% url 'delete' campaign.id %}" 
-       class="text-red-500 hover:text-red-700" 
-       onclick="return confirm('Are you sure you want to delete this campaign? This action cannot be undone.')">
-        <i data-lucide="trash-2" class="w-4 h-4"></i>
-    </a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="5" class="px-6 py-10 text-center text-gray-400">
-                You haven't created any campaigns yet. 
-                <a href="#" class="text-indigo-600 underline">Start your first one!</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <div class="w-32 bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
+        {% with last_fund=campaign.fund_set.last %}
+            <div class="bg-indigo-600 h-full rounded-full transition-all duration-500" >
+              
+            </div>
+        {% endwith %}
+    </div>
+
+    <p class="text-[10px] text-indigo-500 font-bold mt-1">
+        Target: ₹{{ campaign.goal }}
+    </p>
+</td>
+                            <td class="px-6 py-4 flex space-x-4">
+                                <a href="" class="text-indigo-600 hover:text-indigo-900"><i data-lucide="eye" class="w-4 h-4"></i></a>
+                                <a href="{% url 'delete' campaign.id %}" class="text-red-500 hover:text-red-700" onclick="return confirm('Delete this campaign?')">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-10 text-center text-gray-400 italic">No campaigns created yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 bg-indigo-50/50">
+                    <h3 class="font-bold text-indigo-900 text-sm uppercase tracking-wider">Recent Contributions</h3>
+                </div>
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-gray-400 text-[10px] uppercase font-bold">
+                        <tr>
+                            <th class="px-6 py-3">Donor</th>
+                            <th class="px-6 py-3">Campaign</th>
+                            <th class="px-6 py-3">Amount</th>
+                            <th class="px-6 py-3">Transaction ID</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-xs">
+                        {% for fund in funds %}
+                        <tr>
+                            <td class="px-6 py-4 font-medium text-gray-900">{{ fund.name }}</td>
+                            <td class="px-6 py-4 text-gray-500">{{ fund.campain.title }}</td>
+                            <td class="px-6 py-4 text-green-600 font-bold">₹{{ fund.cash }}</td>
+                            <td class="px-6 py-4 font-mono text-gray-400">{{ fund.razorpay_order_id }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
 
     <script>
-        // Initialize Lucide icons
         lucide.createIcons();
     </script>
 </body>
