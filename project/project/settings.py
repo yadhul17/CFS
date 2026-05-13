@@ -38,7 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app'
+    'app',
+    # 'django.contrib.sites',      
+    #    'allauth',                          
+    # 'allauth.account',                 
+    # 'allauth.socialaccount',           
+    # 'allauth.socialaccount.providers.google',   
+
 ]
 
 MIDDLEWARE = [
@@ -49,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+   
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -126,3 +133,32 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 RAZORPAY_KEY_ID="rzp_test_S32lwANnArpx7J"
 RAZORPAY_KEY_SECRET="f6ebt0Y8yyc1MNcvoJ9ohNW5"
+
+
+
+# settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'yadhuljayakumar@gmail.com'
+EMAIL_HOST_PASSWORD = 'dkmd hooe xcgs xwyr' # Use a Google App Password, not your regular password
+
+# SITE_ID = 1
+
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',       # default
+#     'allauth.account.auth_backends.AuthenticationBackend',  # allauth
+# ]
+
+# # Allauth settings
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         'SCOPE': ['profile', 'email'],
+#         'AUTH_PARAMS': {'access_type': 'online'},
+#     }
+# }
+
+# LOGIN_REDIRECT_URL = '/userdashboard/'       # where to go after login
+# LOGOUT_REDIRECT_URL = '/login' # where to go after logout
+# ACCOUNT_EMAIL_VERIFICATION = 'none'  # or 'mandatory'

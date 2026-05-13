@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payout Successful | FundWave</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 font-sans antialiased">
+
+    <div class="min-h-screen flex items-center justify-center py-12 px-4">
+        <div class="max-w-md w-full text-center">
+            
+            <div class="mb-8 relative">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-lg">
+                    <i data-lucide="check" class="text-green-600 w-12 h-12 stroke-[3]"></i>
+                </div>
+                <div class="absolute top-0 left-1/2 -translate-x-12 w-24 h-24 animate-ping bg-green-400/20 rounded-full"></div>
+            </div>
+
+            <h1 class="text-3xl font-black text-slate-900 mb-2">Payout Released!</h1>
+            <p class="text-slate-500 mb-8">The funds have been successfully transferred to the conductor's account.</p>
+
+            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xl mb-8 text-left">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Transaction Details</h3>
+                
+                <div class="space-y-4">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500 text-sm">Razorpay Payment ID</span>
+                        <span class="font-mono text-sm font-bold text-indigo-600">{{ payment_id }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between border-t border-slate-50 pt-4">
+                        <span class="text-slate-500 text-sm">Status</span>
+                        <span class="flex items-center gap-1 text-green-600 text-sm font-bold">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i> Verified
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <a href="/admindashboard/" 
+                   class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold shadow-lg transition-all active:scale-95">
+                    Return to Dashboard
+                </a>
+                
+                <button onclick="window.print()" 
+                        class="flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-slate-600 font-medium transition-colors">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    Print Receipt
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

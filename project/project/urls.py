@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
 from app import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -28,6 +28,7 @@ urlpatterns = [
     path('updatestatus/<int:id>/',views.update_campaign_status,name="upadtestatus"),
     path('getusers/',views.get_users,name="getusers"),
     path('',views.home,name="home"),
+   
 
     path('userregister/',views.userregister,name="register"),
     path('userlogin/',views.userlogin,name="login"),
@@ -36,6 +37,11 @@ urlpatterns = [
     path('deletecampagin/<int:id>/',views.deletecampaign,name="delete"),
     path('explore/',views.explore,name="allprojects"),
     path('help/',views.working,),
+    path('withdraw/<int:id>',views.withdraw),
+    path('update-withdraw/<int:pk>/', views.update_withdraw_status, name="update_withdraw_status"),
+    path('pay-withdraw/<int:pk>/', views.process_upi_payment, name='process_upi_payment'),
+    path('payment-success/', views.payment_success_callback, name='payment_success'),
+
 
     path('campain/<int:id>/',views.campainview,name="campain"),
     path('doantefund/<int:id>/',views.donate,name="donates"),

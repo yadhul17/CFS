@@ -34,33 +34,83 @@ def adminlogin(request):
     return render(request,'adminlogin.html')
 
 
+
+
+from django.core.mail import send_mail
+from django.conf import settings
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+
+def update_withdraw_status(request, pk):
+    if request.method == "POST":
+        withdraw_req = get_object_or_404(WithdrawalRequest, id=pk)
+        action = request.POST.get('action')
+        
+        if action == 'approve':
+            withdraw_req.status = 'approved'
+            withdraw_req.save()
+
+            # --- EMAIL LOGIC ---
+            subject = f"Withdrawal Approved: {withdraw_req.campaign.title}"
+            message = (
+                f"Hello {withdraw_req.requested_by.username},\n\n"
+                f"Your withdrawal request for the campaign '{withdraw_req.campaign.title}' has been approved.\n"
+                f"Your amount will be paid through UPI shortly.\n\n"
+                f"Thank you for using FundWave!"
+            )
+            recipient_list = [withdraw_req.requested_by.email]
+            
+            try:
+                send_mail(subject, message, settings.EMAIL_HOST_USER, recipient_list)
+                messages.success(request, "Request approved and email sent to conductor.")
+            except Exception as e:
+                messages.warning(request, "Status updated, but email failed to send.")
+        
+        elif action == 'reject':
+            withdraw_req.status = 'rejected'
+            withdraw_req.save()
+            messages.info(request, "Withdrawal request rejected.")
+
+    return redirect('admindashboard')
+
+
 from django.shortcuts import render
 from .models import Campaign
+
+from django.db.models import Q, Sum
+from .models import Campaign, WithdrawalRequest, Withdrawal # Import your models
 
 def admindashboard(request):
     campains = Campaign.objects.all()
     
+    # Existing stats
     total_count = campains.count()
-    
-   
-    pending_count = Campaign.objects.filter(
-        Q(status="pending") | Q(status="Rejected")
-    ).count()  
-    print(pending_count)  
-    # 4. Get Approved Count (optional but useful for dashboards)
+    pending_count = Campaign.objects.filter(Q(status="pending") | Q(status="Rejected")).count()
     approved_count = Campaign.objects.filter(status="Approved").count()
+
+    # Payout related data
+    withdraw_requests = WithdrawalRequest.objects.all()
+    pending_withdraw_count = WithdrawalRequest.objects.filter(status="pending").count()
+
+    # ✅ NEW: Get all successfully completed payments
+    completed_payouts = Withdrawal.objects.filter(status="completed").order_by('-created_at')
+    
+    # ✅ NEW: Calculate total money paid out
+    total_payout_sum = completed_payouts.aggregate(Sum('amount'))['amount__sum'] or 0
 
     context = {
         'campains': campains,
+        'withdraw_requests': withdraw_requests,
+        'completed_payouts': completed_payouts, # Pass this to HTML
+        'total_payout_sum': total_payout_sum,
         'total_count': total_count,
         'pending_count': pending_count,
         'approved_count': approved_count,
+        'pending_withdraw_count': pending_withdraw_count,
     }
 
-    print(f"Total: {total_count}, Pending: {pending_count}")
-
-    
     return render(request, 'admindashboard.html', context)
+
 
 
 def get_users(request):
@@ -92,7 +142,88 @@ def update_campaign_status(request, id):
 
 
 from django.shortcuts import render, get_object_or_404
+from django.conf import settings
+from .models import WithdrawalRequest, Withdrawal
+
+def process_upi_payment(request, pk):
+    # This view displays the checkout page based on the Request
+    withdraw_req = get_object_or_404(WithdrawalRequest, id=pk)
+    
+    context = {
+        'withdraw': withdraw_req,
+        'conductor': withdraw_req.requested_by,
+        'amount': withdraw_req.campaign.get_current_total(), # Added () if it's a method
+        'razorpay_id': withdraw_req.campaign.razorpay_account_id,
+        'RAZORPAY_KEY_ID': settings.RAZORPAY_KEY_ID,
+    }
+    return render(request, 'payment.html', context)
+
+def payment_success_callback(request):
+    payment_id = request.GET.get('payment_id')
+    request_id = request.GET.get('request_id') # From our JS redirect
+    
+    # 1. Get the original request
+    withdraw_req = get_object_or_404(WithdrawalRequest, id=request_id)
+    
+ 
+
+    # 3. Create the ACTUAL Withdrawal record (the payment log)
+    new_payout = Withdrawal.objects.create(
+        campaign=withdraw_req.campaign,
+        amount=withdraw_req.campaign.get_current_total(),
+        razorpay_payment_id=payment_id,
+        status='completed'
+    )
+    
+    return render(request, 'success_page.html', {'payment_id': payment_id})
+
+
+from django.shortcuts import render, get_object_or_404
 from .models import Campaign
+
+
+
+# def update_withdraw_status(request, id):
+#     withdraw = get_object_or_404(WithdrawalRequest, id=id)
+
+#     if request.method == "POST":
+#         action = request.POST.get("action")
+
+#         if action == "approve":
+#             withdraw.status = "approved"
+#         elif action == "reject":
+#             withdraw.status = "rejected"
+
+#         withdraw.save()
+#         messages.success(request, "Withdraw request updated.")
+
+#     return redirect('admindashboard')
+
+def withdraw(request, id):
+    campaign = get_object_or_404(Campaign, id=id)
+
+    # Security check (Only creator can request withdrawal)
+    if campaign.creator != request.user:
+        messages.error(request, "You are not allowed to withdraw this campaign.")
+        return redirect('admindashboard')
+
+    # Remove any existing pending requests (duplicates)
+    duplicates = WithdrawalRequest.objects.filter(campaign=campaign, status='pending')
+    if duplicates.exists():
+        duplicates.delete()
+        messages.info(request, "Existing pending request(s) removed.")
+
+    # Create a new withdrawal request
+    WithdrawalRequest.objects.create(
+        campaign=campaign,
+        requested_by=request.user,
+        status='pending'
+    )
+
+    messages.success(request, "Withdrawal request sent to admin successfully.")
+    return redirect('dashboard')
+
+
 
 def campainview(request, id):
     # Fetch the campaign or return 404
@@ -192,15 +323,27 @@ def userlogin(request):
 
 from django.db.models import Sum
 
+from django.shortcuts import render
+from django.db.models import Sum, Prefetch
+from .models import Campaign, Fund, Withdrawal
+
 @login_required
 def userdashboard(request):
     user = request.user
-    campaigns = Campaign.objects.filter(creator=user)
     
-    # Get all paid funds for this user's campaigns
+    # Prefetch the latest withdrawal for each campaign
+    # We use 'actual_withdrawals' because that is your related_name
+    latest_withdrawal = Withdrawal.objects.order_by('-created_at')
+    
+    campaigns = Campaign.objects.filter(creator=user).prefetch_related(
+        Prefetch('actual_withdrawals', queryset=latest_withdrawal, to_attr='latest_withdrawal_list')
+    )
+    
+    # Logic to attach the single latest withdrawal object to each campaign
+    for campaign in campaigns:
+        campaign.last_withdrawal = campaign.latest_withdrawal_list[0] if campaign.latest_withdrawal_list else None
+
     funds = Fund.objects.filter(campain__creator=user, is_paid=True).order_by('-id')
-    
-    # Calculate the grand total raised across all campaigns
     total_raised_all = funds.aggregate(Sum('cash'))['cash__sum'] or 0
     
     context = {
@@ -209,45 +352,78 @@ def userdashboard(request):
         'total_raised_all': total_raised_all,
     }
     return render(request, 'userdashboard.html', context)
-def explore(request):
-    query = request.GET.get('q')
     
+def explore(request):
+    # 1. Get parameters
+    query = request.GET.get('q')
+    category_filter = request.GET.get('cat')
+    
+    # 2. INITIALIZE the variable FIRST (This prevents the UnboundLocalError)
+    campaigns_qs = Campaign.objects.all().prefetch_related('project')
+    
+    # 3. Apply Search Filter
     if query:
-        # Filter: title contains query OR description contains query
-        campains = Campaign.objects.filter(
+        campaigns_qs = campaigns_qs.filter(
             Q(title__icontains=query) | 
-            Q(description__icontains=query) |
-            Q(category__icontains=query)
+            Q(description__icontains=query)
         ).distinct()
-    else:
-        # If no query, show all
+
+    # 4. Apply Category Filter
+    if category_filter:
+        campaigns_qs = campaigns_qs.filter(category__iexact=category_filter)
+
+    # 5. Process math (Now 'campaigns_qs' is guaranteed to exist)
+    for campaign in campaigns_qs:
+        current_total = campaign.get_current_total()
+        goal = campaign.goal
+        campaign.current_total_val = current_total
+        campaign.balance = max(goal - Decimal(current_total), 0)
         
-        campains=Campaign.objects.all()
+        if goal > 0:
+            campaign.progress_percent = min((Decimal(current_total) / goal) * 100, 100)
+        else:
+            campaign.progress_percent = 0
 
-    return render (request,'explore.html',{'campains':campains})
+    context = {
+        'campains': campaigns_qs,
+        'active_category': category_filter,
+    }
+    
+    return render(request, 'explore.html', context)
 
 
+
+from decimal import Decimal
 
 def donate(request, id):
+    # Fetch the campaign
     campaign = get_object_or_404(Campaign, id=id)
     
-    # --- 1. CALCULATE LIVE DATA (For the Progress Bar) ---
-    # Get the last successful fund record to find the total_raised snapshot
-    last_fund_record = Fund.objects.filter(
-        campain=campaign, 
-        is_paid=True
-    ).last()
-
-    current_total = last_fund_record.total_raised if last_fund_record else 0
-    balance = max(campaign.goal - current_total, 0)
+    # 1. TRIGGER THE DB UPDATE
+    # This calls the method you wrote in models.py which checks live Sum and saves to DB
+    campaign.update_status()
     
-    if campaign.goal > 0:
-        progress_percent = min((current_total / campaign.goal) * 100, 100)
+    # Refresh the object from DB to make sure we have the latest 'status' and 'total'
+    campaign.refresh_from_db()
+
+    # 2. CALCULATE LIVE DATA FOR UI
+    # Use your model method instead of last_fund_record to ensure 100% accuracy
+    current_total = campaign.get_current_total()
+    goal = campaign.goal
+    balance = max(goal - Decimal(current_total), 0)
+    
+    if goal > 0:
+        progress_percent = min((Decimal(current_total) / goal) * 100, 100)
     else:
         progress_percent = 0
 
-    # --- 2. HANDLE FORM SUBMISSION (POST) ---
+    # 3. HANDLE FORM SUBMISSION (POST)
     if request.method == "POST":
+        # Check if campaign is already completed to prevent over-funding
+        if campaign.status == 'completed':
+            # Redirect or show error if goal is already met
+            return redirect('allprojects')
+
         amount_str = request.POST.get('cash')
         name = request.POST.get('name')
         phoneno = request.POST.get('phoneno')
@@ -255,7 +431,7 @@ def donate(request, id):
         if amount_str:
             amount = int(amount_str)
             
-            # Create Razorpay Order
+            # Razorpay Order Logic
             razorpay_order = razorpay_client.order.create({
                 "amount": amount * 100,  # paise
                 "currency": "INR",
@@ -264,7 +440,6 @@ def donate(request, id):
             
             order_id = razorpay_order['id']
             
-            # Create local Fund record (Not paid yet)
             Fund.objects.create(
                 campain=campaign,
                 cash=amount,
@@ -280,17 +455,16 @@ def donate(request, id):
                 'razorpay_key': settings.RAZORPAY_KEY_ID
             })
 
-    # --- 3. RENDER THE DONATE PAGE (GET) ---
+    # 4. RENDER CONTEXT
     context = {
         'campaign': campaign,
-        'current_state': current_total,      # Used for the "Raised" text
-        'balance': balance,                # Used for "Needed" text
-        'progress': progress_percent,       # Used for bar width
+        'current_state': current_total,
+        'balance': balance,
+        'progress': float(progress_percent),
         'goal_str': "{:,.2f}".format(campaign.goal),
     }
 
     return render(request, 'donate.html', context)
-
 @csrf_exempt
 def payment_success(request):
     if request.method == "POST":
@@ -298,7 +472,6 @@ def payment_success(request):
         order_id = request.POST.get('razorpay_order_id')
         signature = request.POST.get('razorpay_signature')
 
-        # 1. Validation: Ensure we actually got the data
         if not all([payment_id, order_id, signature]):
             return render(request, 'failure.html', {'error': "Missing payment details from Razorpay."})
 
@@ -309,37 +482,44 @@ def payment_success(request):
         }
 
         try:
-            # 2. Verify Signature
             razorpay_client.utility.verify_payment_signature(params_dict)
 
+            # Use atomic transaction to ensure data consistency
             with transaction.atomic():
-                # 3. Fetch the fund record
                 fund = Fund.objects.select_for_update().filter(razorpay_order_id=order_id).first()
                 
                 if not fund:
                     return render(request, 'failure.html', {'error': "Order not found."})
 
-                # Only process if not already paid (prevents issues on page refresh)
+                campaign = fund.campain # Accessing the campaign object
+
                 if not fund.is_paid:
                     fund.is_paid = True
                     fund.razorpay_payment_id = payment_id
-                    fund.save() # Mark as paid first
+                    fund.save() 
 
-                    # 4. Calculate total (Now that is_paid=True, the aggregate will include this fund)
-                    campaign = fund.campain
-                    total_data = Fund.objects.filter(
-                        campain=campaign, 
-                        is_paid=True
-                    ).aggregate(Sum('cash'))
+                    # ✅ TRIGGER STATUS UPDATE HERE
+                    # This calls your model method which calculates the total 
+                    # and flips status to 'completed' if the goal is met.
+                    campaign.update_status()
+
+                    # Re-fetch/refresh total for the success page UI
+                    actual_total_raised = campaign.get_current_total()
                     
-                    actual_total_raised = total_data['cash__sum'] or 0
-                    
-                    # 5. Update the snapshot
+                    # Update snapshot on the fund record
                     fund.total_raised = actual_total_raised
                     fund.save()
+                else:
+                    # If already paid (page refresh), just get the current total
+                    actual_total_raised = campaign.get_current_total()
 
+            # Logic for UI Progress Bar
             remain = max(campaign.goal - actual_total_raised, 0)
-    
+            print(remain)
+            if remain==0:
+                campaign.status = 'completed'
+                campaign.save()
+
             progress_percentage = 0
             if campaign.goal > 0:
                 progress_percentage = min((actual_total_raised / campaign.goal) * 100, 100)
@@ -354,16 +534,12 @@ def payment_success(request):
                 'goal': campaign.goal,
             }
             return render(request, 'success.html', context)
-                
-                # If already paid, just show success
-               
 
         except razorpay.errors.SignatureVerificationError:
             return render(request, 'failure.html', {'error': "Signature mismatch. Authenticity could not be verified."})
         except Exception as e:
-            # This will catch things like spelling errors (e.g., if 'campain' is wrong)
             print(f"CRITICAL ERROR: {str(e)}") 
-            return render(request, 'failure.html', {'error': "An internal error occurred."})
+            return render(request, 'failure.html', {'error': f"An internal error occurred: {str(e)}"})
 
     return redirect('home')
 def createcampain(request):
@@ -384,6 +560,7 @@ def createcampain(request):
 
         # 3. Collect File Data
         image = request.FILES.get('image')
+        campaign_file = request.FILES.get('file') 
 
         # 4. Create and Save the Model Instance
         try:
@@ -397,6 +574,8 @@ def createcampain(request):
                 conductor_contact=conductor_contact,
                 conductor_bio=conductor_bio,
                 image=image,
+                file=campaign_file,
+
                 # Link the razorpay ID here
                 razorpay_account_id=razorpay_id, 
                 status='pending'

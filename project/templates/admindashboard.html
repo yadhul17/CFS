@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title> {% block title %}Admin Dashboard | CrowdFund{% endblock %} </title>
+    <title> {% block title %}Admin Dashboard | FundWave{% endblock %} </title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -21,13 +20,11 @@
         </div>
 
         <nav class="flex-1 px-4 space-y-2">
-            <a href="../admindashboard/" class="flex items-center gap-3 p-3 rounded-xl font-medium  {% if request.resolver_match.url_name == 'admindashboard' %} bg-indigo-50 text-indigo-600 {% else %} text-slate-500 hover:bg-slate-50 {% endif %}">
+            <a href="../admindashboard/" class="flex items-center gap-3 p-3 rounded-xl font-medium {% if request.resolver_match.url_name == 'admindashboard' %} bg-indigo-50 text-indigo-600 {% else %} text-slate-500 hover:bg-slate-50 {% endif %}">
                 <i data-lucide="home" class="w-5 h-5"></i> Dashboard
-
             </a>
-            <a href="../getusers/"
-                class="flex items-center gap-3 p-3  rounded-xl transition-all {% if request.resolver_match.url_name == 'getusers' %} bg-indigo-50 text-indigo-600 {% else %} text-slate-500 hover:bg-slate-50 {% endif %}">
-                <i data-lucide="layers" class="w-5 h-5"></i> users
+            <a href="../getusers/" class="flex items-center gap-3 p-3 rounded-xl transition-all {% if request.resolver_match.url_name == 'getusers' %} bg-indigo-50 text-indigo-600 {% else %} text-slate-500 hover:bg-slate-50 {% endif %}">
+                <i data-lucide="layers" class="w-5 h-5"></i> Users
             </a>
             <a href="#" class="flex items-center gap-3 p-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all">
                 <i data-lucide="users" class="w-5 h-5"></i> Backers
@@ -36,129 +33,263 @@
                 <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Reports
             </a>
         </nav>
-
-
     </aside>
 
     <main class="flex-1 overflow-y-auto">
-        <header
-            class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-20">
-            <h2 class="text-lg font-semibold text-slate-800">Overview</h2>
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-20">
+            <h2 class="text-lg font-semibold text-slate-800">Admin Overview</h2>
             <div class="flex items-center gap-4">
                 <button class="p-2 text-slate-400 hover:text-indigo-600 transition-colors">
                     <i data-lucide="bell" class="w-5 h-5"></i>
                 </button>
-                <div
-                    class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs">
-                    YJ
-                </div>
+                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs">YJ</div>
             </div>
         </header>
-        <div>
 
-            {% block content %}
-
-            <div class="p-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-2 bg-green-50 text-green-600 rounded-lg">
-                                <i data-lucide="dollar-sign" class="w-6 h-6"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-slate-500 text-sm font-medium">Total campains</h3>
-                        <p class="text-2xl font-bold text-slate-800 mt-1">{{total_count}}</p>
+        {% block content %}
+        <div class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                    <div class="p-2 w-fit bg-green-50 text-green-600 rounded-lg mb-4">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
                     </div>
-
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                                <i data-lucide="rocket" class="w-6 h-6"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-slate-500 text-sm font-medium">Active Campaigns</h3>
-                        <p class="text-2xl font-bold text-slate-800 mt-1">{{approved_count}}</p>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-2 bg-orange-50 text-orange-600 rounded-lg">
-                                <i data-lucide="clock" class="w-6 h-6"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-slate-500 text-sm font-medium">Pending Approvals</h3>
-                        <p class="text-2xl font-bold text-slate-800 mt-1">{{pending_count}}</p>
-                    </div>
+                    <h3 class="text-slate-500 text-sm font-medium">Total Campaigns</h3>
+                    <p class="text-2xl font-bold text-slate-800 mt-1">{{total_count}}</p>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-800">Recent Campaigns</h3>
-                        <button class="text-sm text-indigo-600 font-medium hover:underline">View All</button>
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                    <div class="p-2 w-fit bg-blue-50 text-blue-600 rounded-lg mb-4">
+                        <i data-lucide="rocket" class="w-6 h-6"></i>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                    <h3 class="text-slate-500 text-sm font-medium">Active Campaigns</h3>
+                    <p class="text-2xl font-bold text-slate-800 mt-1">{{approved_count}}</p>
+                </div>
 
-                            <thead>
-                                <tr class="bg-slate-50 text-slate-400 text-xs uppercase tracking-wider">
-                                    <th class="px-6 py-4 font-medium">Campaign Name</th>
-                                    <th class="px-6 py-4 font-medium">Category</th>
-                                    <th class="px-6 py-4 font-medium">Goal</th>
-                                    <th class="px-6 py-4 font-medium">Progress</th>
-                                    <th class="px-6 py-4 font-medium">Status</th>
-                                    <th class="px-6 py-4 font-medium ">Actions</th>
-                                    <th class="px-6 py-4 font-medium">creator Name</th>
-
-
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 text-sm">
-                                {% for i in campains %}
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 font-semibold text-slate-700">{{i.title}}</td>
-                                    <td class="px-6 py-4 text-slate-500">{{i.category}}</td>
-                                    <td class="px-6 py-4 text-slate-700">{{i.goal}}</td>
-                                    <td class="px-6 py-4">
-                                        <div class="w-full bg-slate-100 rounded-full h-2">
-                                            <div class="bg-indigo-600 h-2 rounded-full" style="width: 0%"></div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span
-                                            class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-medium">{{i.status}}</span>
-                                    </td>
-                                    <td class="px-6 py-4  space-x-2">
-                                        <form method="POST" action="{% url 'upadtestatus' i.id %}">
-                                            {% csrf_token %} <button type="submit" name="action" value="approve"
-                                                class="px-3 py-1 bg-indigo-600 text-white rounded-md text-xs font-medium hover:bg-indigo-700 transition-colors">
-                                                Approve
-                                            </button>
-
-                                            <button type="submit" name="action" value="reject"
-                                                class="px-3 py-1 border border-red-200 text-red-600 rounded-md text-xs font-medium hover:bg-red-50 transition-colors">
-                                                Reject
-                                            </button>
-                                        </form>
-
-
-
-                                    </td>
-                                    <td class="px-6 py-4 text-slate-500">{{i.conductor_name}}</td>
-
-                                </tr>
-
-                            </tbody>
-                            {% endfor %}
-                        </table>
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                    <div class="p-2 w-fit bg-orange-50 text-orange-600 rounded-lg mb-4">
+                        <i data-lucide="clock" class="w-6 h-6"></i>
                     </div>
+                    <h3 class="text-slate-500 text-sm font-medium">Pending Requests</h3>
+                    <p class="text-2xl font-bold text-slate-800 mt-1">{{pending_withdraw_count}}</p>
+                </div>
+
+                <div class="bg-indigo-600 p-6 rounded-2xl shadow-lg shadow-indigo-100">
+                    <div class="p-2 w-fit bg-white/20 text-white rounded-lg mb-4">
+                        <i data-lucide="banknote" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-indigo-100 text-sm font-medium">Total Disbursed</h3>
+                    <p class="text-2xl font-bold text-white mt-1">₹{{total_payout_sum}}</p>
                 </div>
             </div>
 
-            {% endblock %}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800">Campaign Management</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 text-xs uppercase tracking-wider">
+                                <th class="px-6 py-4">Campaign Name</th>
+                                <th class="px-6 py-4">Goal</th>
+                                <th class="px-6 py-4">Progress</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Creator</th>
+                                <th class="px-6 py-3">Document</th>
+                                <th class="px-6 py-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            {% for i in campains %}
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 font-semibold text-slate-700">{{i.title}}</td>
+                                <td class="px-6 py-4 text-slate-700">₹{{i.goal}}</td>
+                                <td class="px-6 py-4">
+                                    {% widthratio i.get_current_total i.goal 100 as progress %}
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold">₹{{ i.get_current_total }}</span>
+                                    </div>
+                                    <div class="w-32 bg-slate-200 rounded-full h-1.5 mt-1 overflow-hidden">
+                                        <div class="h-full bg-indigo-600" style="width: {{ progress }}%"></div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 bg-green-50 text-green-600 rounded text-[10px] font-bold uppercase">{{i.status}}</span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-500">{{i.conductor_name}}</td>
+                               <td class="px-6 py-4">
+   
+ <td class="px-6 py-4">
+    {% if i.file %}
+        <a href="{{ i.file.url }}" target="_blank"
+           class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium group">
+            <i data-lucide="file-check" class="w-4 h-4 mr-1.5 text-green-500"></i>
+            <span class="truncate max-w-[100px]" title="{{ i.file.name }}">
+                View Attached File
+            </span>
+        </a>
+    {% else %}
+        <div class="flex items-center text-gray-400 text-xs italic">
+            <i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1 opacity-50"></i>
+            No file found
         </div>
+    {% endif %}
+</td>
+
+                                <td class="px-6 py-4">
+    {% if i.status|lower == 'completed' %}
+        <span class="flex items-center gap-1 text-green-600 font-bold text-[10px] uppercase tracking-wider">
+            <i data-lucide="lock" class="w-3 h-3"></i> Finalized
+        </span>
+    {% else %}
+        <form method="POST" action="{% url 'upadtestatus' i.id %}" class="flex gap-1">
+            {% csrf_token %}
+            <button type="submit" name="action" value="approve" 
+                    class="p-1 text-slate-400 hover:text-green-600 transition-colors" 
+                    title="Approve">
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+            </button>
+            <button type="submit" name="action" value="reject" 
+                    class="p-1 text-slate-400 hover:text-red-600 transition-colors" 
+                    title="Reject">
+                <i data-lucide="x-circle" class="w-5 h-5"></i>
+            </button>
+        </form>
+    {% endif %}
+</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+                <div class="p-6 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-800">Pending Withdraw Requests</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-xs uppercase text-slate-400">
+                                <th class="px-6 py-4">Campaign</th>
+                                <th class="px-6 py-4">Requested By</th>
+                                <th class="px-6 py-4">Amount to Pay</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Action</th>
+                            </tr>
+                        </thead>
+                       <tbody class="divide-y divide-slate-100">
+    {% for w in withdraw_requests %}
+    <tr class="hover:bg-slate-50 transition-colors">
+        <td class="px-6 py-4 font-medium text-slate-700">{{ w.campaign.title }}</td>
+        <td class="px-6 py-4 text-slate-500">{{ w.requested_by.username }}</td>
+        <td class="px-6 py-4 font-bold text-slate-900">₹{{ w.campaign.get_current_total }}</td>
+        <td class="px-6 py-4">
+            <span class="px-2 py-1 rounded text-xs font-bold
+                {% if w.status|lower == 'approved' %} bg-blue-50 text-blue-600 
+                {% elif w.status|lower == 'pending' %} bg-orange-50 text-orange-600 
+                {% else %} bg-slate-100 text-slate-500 {% endif %}">
+                {{ w.status }}
+            </span>
+        </td>
+
+        <td class="px-6 py-4">
+            {% comment %} 
+                Check if there are any completed withdrawals linked to this campaign 
+            {% endcomment %}
+            
+            {% if w.campaign.actual_withdrawals.all %}
+                {% for payout in w.campaign.actual_withdrawals.all %}
+                    {% if payout.status == 'completed' %}
+                        <span class="flex items-center gap-1.5 text-green-600 font-bold text-xs uppercase tracking-wider">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                            Paid
+                        </span>
+                    {% endif %}
+                {% endfor %}
+
+            {% elif w.status|lower == 'approved' %}
+                <a href="{% url 'process_upi_payment' w.id %}" 
+                   class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center gap-2 w-fit transition-transform active:scale-95">
+                    <i data-lucide="credit-card" class="w-4 h-4"></i> Pay Now
+                </a>
+
+            {% else %}
+                <form method="POST" action="{% url 'update_withdraw_status' w.id %}" class="flex gap-2">
+                    {% csrf_token %}
+                    <button name="action" value="approve" 
+                            class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-md font-bold text-xs hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                        Review Request
+                    </button>
+                </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 shadow-xl overflow-hidden">
+                <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                    <h3 class="font-bold text-white flex items-center gap-2">
+                        <i data-lucide="history" class="w-5 h-5 text-indigo-400"></i>
+                        Payout History (Completed)
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="bg-white/5 text-xs uppercase text-slate-400">
+                                <th class="px-6 py-4 font-semibold">Campaign</th>
+                                <th class="px-6 py-4 font-semibold text-center">Amount Disbursed</th>
+                                <th class="px-6 py-4 font-semibold">Razorpay ID</th>
+                                <th class="px-6 py-4 font-semibold">Processed Date</th>
+                                <th class="px-6 py-4 font-semibold text-center">Verification</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            {% for payout in completed_payouts %}
+                            <tr class="hover:bg-white/5 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="font-bold text-white">{{ payout.campaign.title }}</div>
+                                    <div class="text-[10px] text-slate-500 uppercase tracking-tighter">ID: {{ payout.id }}</div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="text-green-400 font-black">₹{{ payout.amount }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <code class="text-xs text-indigo-300 bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20">
+                                        {{ payout.razorpay_payment_id }}
+                                    </code>
+                                </td>
+                                <td class="px-6 py-4 text-slate-400">
+                                    {{ payout.created_at|date:"M d, Y" }}
+                                    <span class="block text-[10px] opacity-50">{{ payout.created_at|time:"H:i A" }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex justify-center">
+                                        <span class="flex items-center gap-1.5 bg-green-500/10 text-green-500 px-3 py-1 rounded-full text-[10px] font-bold border border-green-500/20 uppercase">
+                                            <i data-lucide="shield-check" class="w-3 h-3"></i> Verified
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center text-slate-500 italic">No completed transactions yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endblock %}
     </main>
 
     <script>lucide.createIcons();</script>
 </body>
-
 </html>

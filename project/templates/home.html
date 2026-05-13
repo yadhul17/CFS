@@ -208,16 +208,7 @@
                     <p class="text-slate-500 text-sm mb-4 line-clamp-2">{{ campaign.description }}</p>
                     
                     <!-- Progress Bar -->
-                    <div class="mb-4">
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full gradient-primary rounded-full transition-all duration-500" 
-                                 style="width: {% widthratio campaign.raised campaign.goal 100 %}%"></div>
-                        </div>
-                        <div class="flex justify-between mt-2 text-xs text-slate-500">
-                            <span>${{ campaign.raised|floatformat:0 }} raised</span>
-                            <span>{% widthratio campaign.raised campaign.goal 100 %}%</span>
-                        </div>
-                    </div>
+                   
                     
                     <!-- Footer -->
                     <div class="flex justify-between items-center mt-6 pt-6 border-t border-slate-100">

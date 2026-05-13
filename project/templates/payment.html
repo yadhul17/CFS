@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FundWave | Secure Payout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body class="bg-slate-50 font-sans antialiased">
+
+    <div class="min-h-screen flex items-center justify-center py-12 px-4">
+        <div class="max-w-md w-full">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+                
+                <div class="bg-indigo-600 p-8 text-center relative">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30">
+                        <i data-lucide="shield-check" class="text-white w-10 h-10"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">Payout Verification</h2>
+                    <p class="text-indigo-100 text-sm opacity-90">{{ withdraw.campaign.title }}</p>
+                </div>
+
+                <div class="p-8 space-y-6">
+                    <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+                        <span class="text-sm text-slate-500 flex items-center gap-2">
+                            <i data-lucide="user" class="w-4 h-4"></i> Beneficiary
+                        </span>
+                        <span class="font-bold text-slate-800">{{ conductor.username }}</span>
+                    </div>
+
+                    <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+                        <span class="text-sm text-slate-500 flex items-center gap-2">
+                            <i data-lucide="hash" class="w-4 h-4"></i> Campaign ID
+                        </span>
+                        <span class="font-mono text-xs bg-slate-100 px-2 py-1 rounded text-slate-600">
+                            #{{ withdraw.campaign.id }}
+                        </span>
+                    </div>
+
+                    <div class="bg-slate-900 p-6 rounded-2xl flex flex-col items-center shadow-inner">
+                        <div class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Total Payout</div>
+                        <div class="text-4xl font-black text-white">₹{{ amount }}</div>
+                    </div>
+
+                    <button id="rzp-button" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 group">
+                        Confirm & Release Funds
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        document.getElementById('rzp-button').onclick = function(e) {
+            // Logic: amount * 100 because Razorpay expects paise
+            const totalAmount = parseFloat("{{ amount }}") * 100;
+
+            const options = {
+                "key": "{{ RAZORPAY_KEY_ID }}", 
+                "amount": totalAmount,
+                "currency": "INR",
+                "name": "FundWave Payout",
+                "description": "Payout for {{ withdraw.campaign.title }}",
+                "handler": function (response) {
+                    // We pass the Request ID (pk) to the success callback
+                    window.location.href = `/payment-success/?payment_id=${response.razorpay_payment_id}&request_id={{ withdraw.id }}`;
+                },
+                "prefill": {
+                    "name": "{{ conductor.username }}",
+                    "email": "{{ conductor.email }}"
+                },
+                "theme": { "color": "#4f46e5" }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+            e.preventDefault();
+        };
+    </script>
+</body>
+</html>

@@ -5,146 +5,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Explore Campaigns | Fundwave</title>
-    <meta name="description" content="Discover and support innovative projects on Fundwave. Browse campaigns in technology, education, environment, and more.">
+    <meta name="description" content="Discover and support innovative projects on Fundwave.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    },
-                    borderRadius: {
-                        '4xl': '2rem',
-                        '5xl': '2.5rem',
-                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], },
+                    borderRadius: { '4xl': '2rem', '5xl': '2.5rem', },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
-                        'pulse-soft': 'pulse-soft 4s ease-in-out infinite',
                         'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
-                        'slide-in': 'slide-in 0.4s ease-out forwards',
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-20px)' },
-                        },
-                        'pulse-soft': {
-                            '0%, 100%': { opacity: '0.4' },
-                            '50%': { opacity: '0.6' },
-                        },
-                        'fade-in-up': {
-                            from: { opacity: '0', transform: 'translateY(30px)' },
-                            to: { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        'slide-in': {
-                            from: { opacity: '0', transform: 'translateX(-20px)' },
-                            to: { opacity: '1', transform: 'translateX(0)' },
-                        },
+                        float: { '0%, 100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-20px)' }, },
+                        'fade-in-up': { from: { opacity: '0', transform: 'translateY(30px)' }, to: { opacity: '1', transform: 'translateY(0)' }, },
                     },
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-        }
-        
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-        
-        .gradient-primary {
-            background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
-        }
-        
-        .gradient-text {
-            background: linear-gradient(90deg, #22d3ee 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .shadow-card {
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
-        }
-        
-        .shadow-card-hover {
-            box-shadow: 0 30px 60px rgba(59, 130, 246, 0.15);
-        }
-        
-        .shadow-nav {
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
-        }
-        
-        .progress-bar {
-            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .progress-glow {
-            box-shadow: 0 0 12px rgba(34, 211, 238, 0.5);
-        }
-        
-        .project-card {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .project-card:hover {
-            transform: translateY(-8px);
-        }
-        
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); }
+        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); }
+        .gradient-primary { background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%); }
+        .gradient-text { background: linear-gradient(90deg, #22d3ee 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .shadow-card { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04); }
+        .shadow-card-hover { box-shadow: 0 30px 60px rgba(59, 130, 246, 0.15); }
+        .progress-bar { transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .progress-glow { box-shadow: 0 0 12px rgba(34, 211, 238, 0.5); }
+        .project-card { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .project-card:hover { transform: translateY(-8px); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .category-btn {
-            transition: all 0.3s ease;
-        }
-        
-        .category-btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .category-btn.active {
-            background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-        }
-        
-        .search-input:focus {
-            box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.15);
-        }
-        
-        .animate-stagger > *:nth-child(1) { animation-delay: 0.05s; }
-        .animate-stagger > *:nth-child(2) { animation-delay: 0.1s; }
-        .animate-stagger > *:nth-child(3) { animation-delay: 0.15s; }
-        .animate-stagger > *:nth-child(4) { animation-delay: 0.2s; }
-        .animate-stagger > *:nth-child(5) { animation-delay: 0.25s; }
-        .animate-stagger > *:nth-child(6) { animation-delay: 0.3s; }
+        .category-btn.active { background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%); color: white; border-color: transparent; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen relative overflow-x-hidden font-sans">
 
-    <!-- Background Blobs -->
     <div class="fixed top-0 left-0 w-full h-full z-[-1] pointer-events-none overflow-hidden">
-        <div class="absolute w-[400px] md:w-[600px] h-[400px] md:h-[600px] top-[-15%] right-[-10%] bg-cyan-200/30 rounded-full blur-[120px] animate-pulse"></div>
-        <div class="absolute w-[350px] md:w-[500px] h-[350px] md:h-[500px] top-[40%] left-[-10%] bg-blue-200/40 rounded-full blur-[100px] animate-pulse" style="animation-delay: 1s;"></div>
-        <div class="absolute w-[300px] md:w-[450px] h-[300px] md:h-[450px] bottom-[-5%] right-[20%] bg-indigo-100/40 rounded-full blur-[110px] animate-pulse" style="animation-delay: 2s;"></div>
+        <div class="absolute w-[400px] h-[400px] top-[-15%] right-[-10%] bg-cyan-200/30 rounded-full blur-[120px]"></div>
+        <div class="absolute w-[350px] h-[350px] top-[40%] left-[-10%] bg-blue-200/40 rounded-full blur-[100px]"></div>
     </div>
 
-    <!-- Navbar -->
-    <nav class="sticky top-0 z-50 glass-nav shadow-nav">
+    <nav class="sticky top-0 z-50 glass-nav border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <!-- Logo & Search -->
             <div class="flex items-center gap-8">
                 <a href="{% url 'home' %}" class="flex items-center gap-2 group">
                     <div class="w-9 h-9 gradient-primary rounded-full shadow-lg group-hover:scale-110 transition-transform"></div>
@@ -154,259 +59,130 @@
                     </div>
                 </a>
                 
-                <!-- Search Bar -->
-                <form action="{% url 'allprojects' %}" method="GET" class="hidden md:flex items-center glass-card rounded-full px-5 py-2.5 w-80 lg:w-96 search-input transition-all duration-300 focus-within:w-[420px]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <input 
-                        type="text" 
-                        name="q" 
-                        value="{{ request.GET.q|default:'' }}" 
-                        placeholder="Search campaigns..." 
-                        class="bg-transparent border-none focus:outline-none w-full text-sm font-medium placeholder:text-slate-400"
-                    >
-                </form>
+               <form action="{% url 'allprojects' %}" method="GET" class="hidden md:flex items-center glass-card rounded-full px-5 py-2.5 w-80 lg:w-96 focus-within:ring-2 focus-within:ring-cyan-100 transition-all">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+    
+    <input 
+        type="text" 
+        name="q" 
+        value="{{ request.GET.q|default:'' }}" 
+        placeholder="Search campaigns..." 
+        class="bg-transparent border-none focus:outline-none w-full text-sm font-medium placeholder:text-slate-400"
+    >
+
+    {% if request.GET.q %}
+        <a href="{% url 'allprojects' %}" class="ml-2 text-slate-400 hover:text-rose-500 transition-colors" title="Clear search">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </a>
+    {% endif %}
+</form>
             </div>
-            
-            <!-- Actions -->
-           
-       
-        
-        <!-- Mobile Search -->
-        <div class="md:hidden px-6 pb-4">
-            <form action="{% url 'allprojects' %}" method="GET" class="flex items-center glass-card rounded-full px-4 py-2.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input 
-                    type="text" 
-                    name="q" 
-                    value="{{ request.GET.q|default:'' }}" 
-                    placeholder="Search campaigns..." 
-                    class="bg-transparent border-none focus:outline-none w-full text-sm"
-                >
-            </form>
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 py-10">
         
-        <!-- Category Tabs -->
         <div class="flex gap-3 overflow-x-auto pb-6 no-scrollbar">
-            <button class="category-btn active px-6 py-2.5 rounded-full whitespace-nowrap font-bold text-sm border-2 border-transparent">
-                All Projects
-            </button>
-            <button class="category-btn px-6 py-2.5 glass-card rounded-full whitespace-nowrap font-semibold text-sm text-slate-600 border-2 border-white/50 hover:border-cyan-300">
-                🚀 Technology
-            </button>
-            <button class="category-btn px-6 py-2.5 glass-card rounded-full whitespace-nowrap font-semibold text-sm text-slate-600 border-2 border-white/50 hover:border-cyan-300">
-                📚 Education
-            </button>
-            <button class="category-btn px-6 py-2.5 glass-card rounded-full whitespace-nowrap font-semibold text-sm text-slate-600 border-2 border-white/50 hover:border-cyan-300">
-                🌱 Environment
-            </button>
-            <button class="category-btn px-6 py-2.5 glass-card rounded-full whitespace-nowrap font-semibold text-sm text-slate-600 border-2 border-white/50 hover:border-cyan-300">
-                🏥 Medical
-            </button>
-            <button class="category-btn px-6 py-2.5 glass-card rounded-full whitespace-nowrap font-semibold text-sm text-slate-600 border-2 border-white/50 hover:border-cyan-300">
-                🎨 Creative
-            </button>
-            <button class="category-btn px-6 py-2.5 glass-card rounded-full whitespace-nowrap font-semibold text-sm text-slate-600 border-2 border-white/50 hover:border-cyan-300">
-                🏠 Community
-            </button>
-        </div>
+    <a href="{% url 'allprojects' %}" 
+       class="category-btn {% if not active_category %}active{% endif %} px-6 py-2.5 rounded-full whitespace-nowrap font-bold text-sm border-2 border-transparent glass-card text-slate-600">
+        All Projects
+    </a>
 
-        <!-- Header Section -->
+    <a href="{% url 'allprojects' %}?cat=Technology" 
+       class="category-btn {% if active_category == 'Technology' %}active{% endif %} px-6 py-2.5 glass-card rounded-full whitespace-nowrap font-semibold text-sm text-slate-600 border-2 border-white/50 hover:border-cyan-300">
+        🚀 Technology
+    </a>
+
+    <a href="{% url 'allprojects' %}?cat=Education" 
+       class="category-btn {% if active_category == 'Education' %}active{% endif %} px-6 py-2.5 glass-card rounded-full whitespace-nowrap font-semibold text-sm text-slate-600 border-2 border-white/50 hover:border-cyan-300">
+        📚 Education
+    </a>
+
+    <a href="{% url 'allprojects' %}?cat=Environment" 
+       class="category-btn {% if active_category == 'Environment' %}active{% endif %} px-6 py-2.5 glass-card rounded-full whitespace-nowrap font-semibold text-sm text-slate-600 border-2 border-white/50 hover:border-cyan-300">
+        🌱 Environment
+    </a>
+</div>
+
         <div class="mt-6 mb-12 animate-fade-in-up">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <span class="text-xs font-black uppercase tracking-[0.3em] text-cyan-500 mb-3 block">Discover & Support</span>
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-900">
-                        Explore <span class="gradient-text">{{ campaigns.count }}</span> Campaigns
-                    </h1>
-                    <p class="text-slate-500 mt-3 text-lg max-w-xl">
-                        Directly support the people and ideas you believe in. Every contribution makes a difference.
-                    </p>
-                </div>
-                
-                <!-- Sort/Filter -->
-                <div class="flex items-center gap-3">
-                    <select class="glass-card px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 border-none focus:outline-none focus:ring-2 focus:ring-cyan-300 cursor-pointer">
-                        <option>Most Popular</option>
-                        <option>Newest First</option>
-                        <option>Ending Soon</option>
-                        <option>Most Funded</option>
-                    </select>
-                </div>
-            </div>
+            <span class="text-xs font-black uppercase tracking-[0.3em] text-cyan-500 mb-3 block">Discover & Support</span>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
+                Explore <span class="gradient-text">{{ campains|length }}</span> Campaigns
+            </h1>
         </div>
 
-        <!-- Campaign Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-stagger">
-            
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for campaign in campains %}
-            <div class="project-card glass-card rounded-4xl overflow-hidden shadow-card hover:shadow-card-hover flex flex-col opacity-0 animate-fade-in-up">
-                <!-- Image -->
+            <div class="project-card glass-card rounded-4xl overflow-hidden shadow-card hover:shadow-card-hover flex flex-col animate-fade-in-up">
                 <div class="h-56 relative overflow-hidden group">
                     {% if campaign.image %}
-    <img src="{{ campaign.image.url }}" 
-         alt="{{ campaign.title }}" 
-         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-{% else %}
-    <div class="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400 font-bold uppercase tracking-widest text-xs">
-        No Image Provided
-    </div>
-{% endif %}
-                    <!-- Category Badge -->
-                    <span class="absolute top-4 left-4 glass-card px-4 py-1.5 rounded-full text-[10px] font-black text-cyan-600 uppercase tracking-widest shadow-lg">
+                        <img src="{{ campaign.image.url }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    {% else %}
+                        <div class="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400 font-bold uppercase text-xs">No Image</div>
+                    {% endif %}
+
+                    {% if campaign.progress_percent >= 100 %}
+                    <div class="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest z-10 shadow-lg">
+                        Goal Met ✓
+                    </div>
+                    {% endif %}
+
+                    <span class="absolute top-4 left-4 glass-card px-4 py-1.5 rounded-full text-[10px] font-black text-cyan-600 uppercase tracking-widest">
                         {{ campaign.category|default:"General" }}
                     </span>
-                    
-                    <!-- Hover Overlay -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
 
-                <!-- Content -->
                 <div class="p-6 md:p-7 flex flex-col flex-grow">
-                    <h3 class="text-xl font-black text-slate-900 mb-2 line-clamp-1 hover:text-cyan-600 transition-colors">
-                        {{ campaign.title }}
-                    </h3>
-                   
+                    <h3 class="text-xl font-black text-slate-900 mb-2 line-clamp-1 transition-colors">{{ campaign.title }}</h3>
                     
                     <div class="mt-auto space-y-5">
-                        <!-- Progress Bar -->
                         <div class="space-y-3">
                             <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                                 <div class="gradient-primary h-full progress-bar rounded-full progress-glow" 
-                                     style="width: {{ campaign.progress_percentage }}%"></div>
+                                     style="width: {{ campaign.progress_percent }}%"></div>
                             </div>
                             
                             <div class="flex justify-between items-end">
                                 <div>
-                                    <p class="text-xl font-black gradient-text">${{ campaign.raised_amount|floatformat:0 }}</p>
-                                    <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
-                                        raised of ${{ campaign.goal|floatformat:0 }}
-                                    </p>
+                                    <p class="text-xl font-black gradient-text">₹{{ campaign.current_total_val|floatformat:0 }}</p>
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Raised of ₹{{ campaign.goal|floatformat:0 }}</p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-xl font-black text-slate-800">{{ campaign.progress_percentage|floatformat:0 }}%</p>
-                                    <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Funded</p>
+                                    <p class="text-xl font-black text-slate-800">{{ campaign.progress_percent|floatformat:0 }}%</p>
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+                                        {% if campaign.balance > 0 %}₹{{ campaign.balance|floatformat:0 }} Left{% else %}Completed{% endif %}
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Action Button -->
                         <a href="{% url 'campain' campaign.id %}" 
-                           class="block w-full text-center py-3.5 gradient-primary text-white font-black rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 text-sm uppercase tracking-wider">
-                            Support This
+                           class="block w-full text-center py-3.5 {% if campaign.progress_percent >= 100 %}bg-slate-900{% else %}gradient-primary{% endif %} text-white font-black rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 text-sm uppercase tracking-wider">
+                           {% if campaign.progress_percent >= 100 %}View Details{% else %}Support Now{% endif %}
                         </a>
                     </div>
                 </div>
             </div>
             {% empty %}
-            
-            <!-- Empty State -->
-            <div class="col-span-full py-20 text-center animate-fade-in-up">
-                <div class="gradient-primary w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-black text-slate-800 mb-2">No Campaigns Yet</h3>
-                <p class="text-slate-500 mb-8 max-w-md mx-auto">There are no active campaigns to display right now. Be the first to start one!</p>
-                <a href="{% url 'register' %}" class="inline-block gradient-primary text-white px-8 py-4 rounded-full font-bold shadow-xl hover:scale-105 transition-transform">
-                    Start Your Campaign
-                </a>
+            <div class="col-span-full py-20 text-center">
+                <h3 class="text-2xl font-black text-slate-800">No Campaigns Found</h3>
+                <p class="text-slate-500 mt-2">Try a different search term or browse all categories.</p>
             </div>
             {% endfor %}
-
         </div>
-        
-        <!-- Load More -->
-        {% if campaigns.count > 0 %}
-        <div class="mt-16 text-center">
-            <button class="glass-card px-10 py-4 rounded-full font-bold text-slate-600 hover:text-cyan-600 border-2 border-white/50 hover:border-cyan-300 transition-all hover:scale-105 shadow-lg">
-                Load More Campaigns
-            </button>
-        </div>
-        {% endif %}
     </main>
 
-    <!-- Footer -->
-    <footer class="relative z-10 bg-slate-900 text-white mt-20">
-        <div class="max-w-7xl mx-auto px-6 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
-                <!-- Brand -->
-                <div class="md:col-span-1">
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-8 h-8 gradient-primary rounded-full shadow-inner"></div>
-                        <div class="flex items-baseline">
-                            <span class="text-2xl font-black text-cyan-400 tracking-tight">Fund</span>
-                            <span class="text-xl font-black text-white tracking-tighter">wave</span>
-                        </div>
-                    </div>
-                    <p class="text-white/60 text-sm">
-                        Empowering dreamers to turn their visions into reality through community support.
-                    </p>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h4 class="font-bold text-sm uppercase tracking-wider mb-4">Quick Links</h4>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'allprojects' %}" class="text-white/60 hover:text-cyan-400 transition text-sm">Explore</a></li>
-                        <li><a href="{% url 'register' %}" class="text-white/60 hover:text-cyan-400 transition text-sm">Start Campaign</a></li>
-                        <li><a href="../help/" class="text-white/60 hover:text-cyan-400 transition text-sm">How It Works</a></li>
-                        <li><a href="#" class="text-white/60 hover:text-cyan-400 transition text-sm">Success Stories</a></li>
-                    </ul>
-                </div>
-
-                <!-- Support -->
-                <div>
-                    <h4 class="font-bold text-sm uppercase tracking-wider mb-4">Support</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-white/60 hover:text-cyan-400 transition text-sm">Help Center</a></li>
-                        <li><a href="#" class="text-white/60 hover:text-cyan-400 transition text-sm">Contact Us</a></li>
-                        <li><a href="#" class="text-white/60 hover:text-cyan-400 transition text-sm">FAQs</a></li>
-                        <li><a href="#" class="text-white/60 hover:text-cyan-400 transition text-sm">Trust & Safety</a></li>
-                    </ul>
-                </div>
-
-                <!-- Newsletter -->
-                <div>
-                    <h4 class="font-bold text-sm uppercase tracking-wider mb-4">Stay Updated</h4>
-                    <p class="text-white/60 text-sm mb-4">
-                        Get the latest campaigns and success stories.
-                    </p>
-                    <form class="flex gap-2">
-                        <input type="email" 
-                               placeholder="Your email" 
-                               class="flex-1 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
-                        <button type="submit" class="gradient-primary px-5 py-2 rounded-full font-bold text-sm hover:scale-105 transition-transform shadow-lg">
-                            Join
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Bottom -->
-            <div class="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-white/40 text-sm">
-                    © 2024 Fundwave. All rights reserved.
-                </p>
-                <div class="flex gap-6">
-                    <a href="#" class="text-white/40 hover:text-cyan-400 transition text-sm">Privacy</a>
-                    <a href="#" class="text-white/40 hover:text-cyan-400 transition text-sm">Terms</a>
-                    <a href="#" class="text-white/40 hover:text-cyan-400 transition text-sm">Cookies</a>
-                </div>
-            </div>
+    <footer class="bg-slate-900 text-white mt-20 py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-white/40 text-sm">© 2026 Fundwave. Designed by Python Interns.</p>
         </div>
     </footer>
 
     <script>
-        // Category filter toggle
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
